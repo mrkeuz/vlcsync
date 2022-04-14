@@ -4,60 +4,15 @@ from __future__ import annotations
 from cached_property import cached_property_with_ttl
 from func_timeout import func_set_timeout
 
-from functools import cached_property
-import socket
 import subprocess
 import sys
 import time
 import traceback
 
-from loguru import logger
-
-from ps_utils import VLC_IFACE, find_vlc_netstat, find_vlc_psutil
+from ps_utils import find_vlc_psutil
+from vlc_util import Vlc
 
 LINE_END = "\n"
-
-
-class Vlc:
-    def __init__(self, port):
-        self._port = port
-
-    def get_time(self) -> int | None:
-        seek = self._vlc_cmd("get_time")
-        if seek != '':
-            return int(seek)
-
-    def seek(self, seek):
-        self._vlc_cmd(f"seek {seek}")
-
-    @func_set_timeout(0.5)
-    def _vlc_cmd(self, command) -> str:
-        self._s.send(f"{command}\r\n".encode())
-        data = self._recv_answer()
-        return data.decode().replace("> ", "").replace("\r\n", "")
-
-    def _recv_answer(self):
-        data = b''
-        while not data.endswith(b"> "):
-            data += self._s.recv(1)
-        return data
-
-    @cached_property
-    def _s(self) -> socket.socket:
-        logger.debug(f"Connect {self._port}")
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((VLC_IFACE, self._port))
-        data = b''
-        while not data.endswith(b"> "):
-            data += sock.recv(1)
-        return sock
-
-    def close(self):
-        self._s.close()
-
-    def __del__(self):
-        logger.debug(f"Close socket {self._port}...")
-        self.close()
 
 
 class Syncer:
@@ -114,6 +69,9 @@ class Syncer:
         for vlc in self._all_vlc.values():
             vlc.close()
 
+    def __del__(self):
+        self.close()
+
 
 def print_exc():
     print("-" * 60)
@@ -125,7 +83,7 @@ def print_exc():
 
 
 if __name__ == '__main__':
-    print("F1 syncronizer started...")
+    print("F1 stream syncronizer started...")
     time.sleep(2)  # Wait instances
 
     while True:
