@@ -10,6 +10,7 @@ func-timeout = "^4.3.5"
 psutil = "^5.9.0"
 loguru = "^0.6.0"
 cached-property = "^1.5.2"
+profilehooks = "^1.12.0"
 
 [tool.poetry.dev-dependencies]
 

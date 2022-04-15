@@ -82,16 +82,17 @@ class Vlc:
     def seek(self, seek):
         self._vlc_cmd(f"seek {seek}")
 
-    @func_set_timeout(0.5)
     def _vlc_cmd(self, command) -> str:
         self._s.send(f"{command}\r\n".encode())
-        data = self._recv_answer()
+        data = self._recv_answer(self._s)
         return data.decode().replace("> ", "").replace("\r\n", "")
 
-    def _recv_answer(self):
+    @staticmethod
+    @func_set_timeout(0.5)
+    def _recv_answer(sock: socket.socket):
         data = b''
         while not data.endswith(b"> "):
-            data += self._s.recv(128)
+            data += sock.recv(128)
         return data
 
     @cached_property
@@ -99,9 +100,7 @@ class Vlc:
         logger.trace("Connect {0}", self._port)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((VLC_IFACE, self._port))
-        data = b''
-        while not data.endswith(b"> "):
-            data += sock.recv(128)
+        self._recv_answer(sock)
         return sock
 
     def close(self):

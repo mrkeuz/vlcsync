@@ -18,3 +18,8 @@ f1_stream Race
 f1_stream Qal
 """
 
+
+- Roadmap 
+  
+  - Nonblocking sockets instead slow func_timeout
+  - Detect main window, time drift by offsets and remove all others logic

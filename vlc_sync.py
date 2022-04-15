@@ -7,6 +7,7 @@ import traceback
 
 from func_timeout import func_set_timeout
 from loguru import logger
+from profilehooks import timecall, profile
 
 import idletools
 from vlc_util import VlcProcs
@@ -27,7 +28,8 @@ class Syncer:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
-    @func_set_timeout(0.5)
+    @profile
+    @timecall(immediate=False)
     def do_sync(self):
         # Heuristics for reduce calls
         if idletools.get_user_idle() > 500:
