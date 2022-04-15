@@ -1,6 +1,6 @@
 import timeit
 
-from ps_utils import find_vlc_psutil, find_vlc_netstat
+from vlc_util import find_vlc_netstat, find_vlc_psutil
 
 
 # Ps_utils 0.069
@@ -14,7 +14,7 @@ def test_netstat():
 
 
 def bench_find_vlc(f):
-    n = 100
+    n = 10
     bench = timeit.timeit(f, globals=globals(), number=n) / n
     print(f"Bench {f}: {bench:.3f} sec")
 
