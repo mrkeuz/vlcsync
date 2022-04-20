@@ -1,7 +1,10 @@
 import re
 import timeit
 
-from utils import VlcFinder
+import xprintidle
+
+import cmd_utils
+from utils import VlcFinder, user_idle_millis
 from vlc_util import VLC_IFACE_IP, PlayState
 
 finder = VlcFinder()
@@ -17,7 +20,7 @@ def test_netstat():
     finder.find_vlc_netstat(VLC_IFACE_IP)
 
 
-def bench_find_vlc(f, n=10):
+def bench_f(f, n=10):
     bench = timeit.timeit(f, globals=globals(), number=n) / n
 
     return bench, f
@@ -69,6 +72,18 @@ def bench_in_cached(_valid_states=(PlayState.PLAYING.value,
         return PlayState.UNKNOWN
 
 
+def bench_xprintidle():
+    return cmd_utils.out("xprintidle")
+
+
+def bench_xprintidle_cffi():
+    return xprintidle.idle_time()
+
+
+def bench_xprintidle_fail_over():
+    return user_idle_millis()
+
+
 def bench_in_enum():
     for pb_state in PlayState:
         # print(pb_state)
@@ -79,17 +94,22 @@ def bench_in_enum():
 
 
 if __name__ == '__main__':
-    for bench, f in sorted([bench_find_vlc("test_ps_utils()"),
-                            bench_find_vlc("test_netstat()")]):
-        print(f"Bench {f:20}: {bench:.3f} sec")
+    for bench, f in sorted([
+        bench_f("test_ps_utils()"),
+        bench_f("test_netstat()"),
+        bench_f("bench_xprintidle()"),
+        bench_f("bench_xprintidle_fail_over()", 1000),
+        bench_f("bench_xprintidle_cffi()", 1000),
+    ]):
+        print(f"Bench {f:20}: {bench:.6f} sec")
 
     print()
 
-    results = [bench_find_vlc("bench_index()"),
-               bench_find_vlc("bench_re()"),
-               bench_find_vlc("bench_in_enum()"),
-               bench_find_vlc("bench_in()"),
-               bench_find_vlc("bench_in_cached()")]
+    results = [bench_f("bench_index()"),
+               bench_f("bench_re()"),
+               bench_f("bench_in_enum()"),
+               bench_f("bench_in()"),
+               bench_f("bench_in_cached()")]
 
     for bench, f in sorted(results):
         print(f"Bench {f:20}: {bench:.9f} sec")

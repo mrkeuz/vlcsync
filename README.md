@@ -19,6 +19,11 @@ f1_stream Qal
 """
 
 
+- Install
+  ```commandline
+  sudo apt install libx11-dev libxss-dev xdottool 
+  ```
+
 - Roadmap 
   
   - Nonblocking sockets instead slow func_timeout

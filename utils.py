@@ -12,6 +12,22 @@ from psutil import Process
 
 import cmd_utils
 
+xprintidle_fail = False
+
+
+def user_idle_millis():
+    global xprintidle_fail
+    if xprintidle_fail:
+        return 0
+
+    try:
+        import xprintidle
+        xprintidle.idle_time()
+    except:
+        print("xprintidle - not available")
+        xprintidle_fail = True
+        return 0
+
 
 class VlcFinder:
     def __init__(self):

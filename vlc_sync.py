@@ -7,8 +7,8 @@ import time
 from loguru import logger
 from profilehooks import timecall, profile
 
-from utils import print_exc
-from vlc_util import VlcProcs, PlayState
+from utils import print_exc, user_idle_millis
+from vlc_util import VlcProcs
 from geometry_utils import rearrange
 
 logger.remove()
@@ -28,6 +28,7 @@ class Syncer:
     @profile
     def do_sync(self):
         for pid, vlc in self.env.all_vlc.items():
+            logger.debug("Sync...")
             sec_changed, sec_state = vlc.is_state_change()
             if not sec_state.is_active():
                 continue
@@ -51,8 +52,10 @@ def main():
     while True:
         try:
             with Syncer() as s:
+                s.do_sync()
                 while True:
-                    s.do_sync()
+                    if user_idle_millis() < 500:
+                        s.do_sync()
                     time.sleep(0.01)
         except KeyboardInterrupt:
             sys.exit(0)
