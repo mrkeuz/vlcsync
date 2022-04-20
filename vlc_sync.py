@@ -1,6 +1,7 @@
 #!/usr/bin/env -S python3 -u
 from __future__ import annotations
 
+import os
 import sys
 import time
 
@@ -11,8 +12,11 @@ from utils import print_exc, user_idle_millis
 from vlc_util import VlcProcs
 from geometry_utils import rearrange
 
-logger.remove()
-# logger.add(sys.stderr, level="INFO")
+if lvl := os.getenv("DEBUG_LEVEL"):
+    logger.remove()
+    logger.add(sys.stderr, level=lvl)
+else:
+    logger.remove()
 
 
 class Syncer:
@@ -48,7 +52,7 @@ class Syncer:
 def main():
     print("F1 stream syncronizer started...")
     time.sleep(2)  # Wait instances
-    rearrange(False)
+    rearrange(os.getenv("DEBUG_LEVEL") is not None)
     while True:
         try:
             with Syncer() as s:
