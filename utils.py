@@ -15,14 +15,14 @@ import cmd_utils
 xprintidle_fail = False
 
 
-def user_idle_millis():
+def user_idle_millis() -> int:
     global xprintidle_fail
     if xprintidle_fail:
         return 0
 
     try:
         import xprintidle
-        xprintidle.idle_time()
+        return xprintidle.idle_time()
     except:
         print("xprintidle - not available")
         xprintidle_fail = True
