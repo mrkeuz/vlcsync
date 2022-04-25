@@ -52,9 +52,9 @@ def geom_list(dev) -> OrderedDict[str, WindGeom]:
     if dev:
         geom["Data.Channel"] = WindGeom(4520, 100, "400x300")
         geom["Driver.Tracker"] = WindGeom(3978, 100, "400x300")
-        geom["Race"] = WindGeom(4248, 500, "500x400")
+        geom[".+"] = WindGeom(4248, 500, "500x400")
     else:
         geom["Data.Channel"] = WindGeom(1, 75, "1920x1043")
         geom["Driver.Tracker"] = WindGeom(3841, 75, "1280x987")
-        geom["Race"] = WindGeom(1921, 106, "1920x946")
+        geom[".+"] = WindGeom(1921, 106, "1920x946")
     return geom
