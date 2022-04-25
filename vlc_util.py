@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-import functools
 from functools import cached_property
 import socket
 import time
@@ -135,10 +134,12 @@ class Vlc:
         data = self._recv_answer(self._s)
         return data.decode().replace("> ", "").replace("\r\n", "")
 
-    @staticmethod
-    def _recv_answer(sock: socket.socket):
+    def _recv_answer(self, sock: socket.socket):
         data = sock.recv(1024)
+        timeout = time.time() + 1
         while not data[-2:] == b"> ":
+            if time.time() > timeout:
+                raise VlcTimeoutError(f"Socket receive answer timeout.", self.pid)
             data += sock.recv(1024)
         return data
 
@@ -167,14 +168,14 @@ class VlcProcs:
         self._vlc_instances: dict[int, Vlc] = {}
         self.vlcFinder = VlcFinder()
 
-    @cached_property_with_ttl(ttl=5)
+    @cached_property_with_ttl(ttl=2)
     def all_vlc(self) -> dict[int, Vlc]:
         logger.trace("Compute all_vlc...")
         vlc_in_system = self.vlcFinder.find_vlc(VLC_IFACE_IP)
 
         # Remove missed
         for missed_pid in (self._vlc_instances.keys() - vlc_in_system.keys()):
-            self._vlc_instances.pop(missed_pid).close()
+            self.dereg(missed_pid)
 
         # Populate if not exists
         for pid, port in vlc_in_system.items():
@@ -204,6 +205,10 @@ class VlcProcs:
                 next_vlc.sync_to(state, source)
         print()
 
+    def dereg(self, pid: int):
+        print(f"Detect vlc instance closed pid {pid}")
+        self._vlc_instances.pop(pid).close()
+
     def close(self):
         for vlc in self._vlc_instances.values():
             vlc.close()
@@ -212,3 +217,9 @@ class VlcProcs:
 
     def __del__(self):
         self.close()
+
+
+class VlcTimeoutError(TimeoutError):
+    def __init__(self, msg: str, pid: int):
+        super().__init__(msg)
+        self.pid = pid

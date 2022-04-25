@@ -9,7 +9,7 @@ from loguru import logger
 from profilehooks import timecall, profile
 
 from utils import print_exc, user_idle_millis
-from vlc_util import VlcProcs
+from vlc_util import VlcProcs, VlcTimeoutError
 from geometry_utils import rearrange
 
 if lvl := os.getenv("DEBUG_LEVEL"):
@@ -21,25 +21,37 @@ else:
 
 class Syncer:
     def __init__(self):
+        self.next_log = 0
         self.env = VlcProcs()
 
     def __enter__(self):
-        return Syncer()
+        syncer = Syncer()
+        syncer.do_sync()
+        return syncer
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
     @profile
     def do_sync(self):
-        for pid, vlc in self.env.all_vlc.items():
-            logger.debug("Sync...")
-            sec_changed, sec_state = vlc.is_state_change()
-            if not sec_state.is_active():
-                continue
+        self.log_with_debounce("Sync...")
+        try:
+            for pid, vlc in self.env.all_vlc.items():
+                is_changed, state = vlc.is_state_change()
+                if not state.is_active():
+                    continue
 
-            if sec_changed:
-                self.env.sync_all(sec_state, vlc)
-                return
+                if is_changed:
+                    self.env.sync_all(state, vlc)
+                    return
+
+        except VlcTimeoutError as e:
+            self.env.dereg(e.pid)
+
+    def log_with_debounce(self, msg: str, _debounce=5):
+        if time.time() > self.next_log:
+            logger.debug(str)
+            self.next_log = time.time() + _debounce
 
     def __del__(self):
         self.close()
@@ -56,7 +68,6 @@ def main():
     while True:
         try:
             with Syncer() as s:
-                s.do_sync()
                 while True:
                     if user_idle_millis() < 500:
                         s.do_sync()

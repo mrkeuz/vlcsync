@@ -6,7 +6,6 @@ authors = ["mrkeuz <mrkeuz@users.noreply.github.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-func-timeout = "^4.3.5"
 psutil = "^5.9.0"
 loguru = "^0.6.0"
 cached-property = "^1.5.2"

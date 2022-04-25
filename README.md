@@ -23,8 +23,3 @@ f1_stream Qal
   ```commandline
   sudo apt install libx11-dev libxss-dev xdottool 
   ```
-
-- Roadmap 
-  
-  - Nonblocking sockets instead slow func_timeout
-  - Detect main window, time drift by offsets and remove all others logic
