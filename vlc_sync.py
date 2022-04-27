@@ -6,11 +6,10 @@ import sys
 import time
 
 from loguru import logger
-from profilehooks import timecall, profile
 
-from utils import print_exc, user_idle_millis
+from idletools import user_idle_millis
+from utils import print_exc
 from vlc_util import VlcProcs, VlcTimeoutError
-from geometry_utils import rearrange
 
 if lvl := os.getenv("DEBUG_LEVEL"):
     logger.remove()
@@ -32,7 +31,6 @@ class Syncer:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
-    @profile
     def do_sync(self):
         self.log_with_debounce("Sync...")
         try:
@@ -60,18 +58,16 @@ class Syncer:
         self.env.close()
 
 
-@timecall()
 def main():
     print("F1 stream syncronizer started...")
     time.sleep(2)  # Wait instances
-    rearrange(os.getenv("DEBUG_LEVEL") is not None)
     while True:
         try:
             with Syncer() as s:
                 while True:
                     if user_idle_millis() < 500:
                         s.do_sync()
-                    time.sleep(0.01)
+                        time.sleep(0.05)
         except KeyboardInterrupt:
             sys.exit(0)
         except:

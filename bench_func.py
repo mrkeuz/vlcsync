@@ -1,29 +1,33 @@
 import re
 import timeit
+from typing import Callable, Iterable
 
 import xprintidle
 
 import cmd_utils
-from utils import VlcFinder, user_idle_millis
+from utils import VlcFinder
+from idletools import user_idle_millis, _xprintidle_cffi, _xprintidle_cmd
 from vlc_util import VLC_IFACE_IP, PlayState
 
 finder = VlcFinder()
 
 
 # Ps_utils 0.069
-def test_ps_utils():
+def bench_finder_utils():
     finder.find_vlc_psutil(VLC_IFACE_IP)
 
 
 # Prev 0.032
-def test_netstat():
+def bench_finder_netstat():
     finder.find_vlc_netstat(VLC_IFACE_IP)
 
 
-def bench_f(f, n=10):
+def bench_f(f: Callable, n=10) -> (int, str):
+    assert callable(f), f"Arg {f=} should callable"
+
     bench = timeit.timeit(f, globals=globals(), number=n) / n
 
-    return bench, f
+    return bench, f.__name__
 
 
 status = "ioqewufpodia state pause"
@@ -72,12 +76,16 @@ def bench_in_cached(_valid_states=(PlayState.PLAYING.value,
         return PlayState.UNKNOWN
 
 
-def bench_xprintidle():
-    return cmd_utils.out("xprintidle")
+def bench_xprintidle_cmd():
+    return _xprintidle_cmd()
 
 
 def bench_xprintidle_cffi():
     return xprintidle.idle_time()
+
+
+def bench_xprintidle_cffi_dyn_import():
+    return _xprintidle_cffi()
 
 
 def bench_xprintidle_fail_over():
@@ -93,23 +101,32 @@ def bench_in_enum():
         return PlayState.UNKNOWN
 
 
-if __name__ == '__main__':
-    for bench, f in sorted([
-        bench_f("test_ps_utils()"),
-        bench_f("test_netstat()"),
-        bench_f("bench_xprintidle()"),
-        bench_f("bench_xprintidle_fail_over()", 1000),
-        bench_f("bench_xprintidle_cffi()", 1000),
-    ]):
-        print(f"Bench {f:20}: {bench:.6f} sec")
-
-    print()
-
-    results = [bench_f("bench_index()"),
-               bench_f("bench_re()"),
-               bench_f("bench_in_enum()"),
-               bench_f("bench_in()"),
-               bench_f("bench_in_cached()")]
+def suite(tests: Iterable[Callable], n=10):
+    results = {bench_f(test) for test in tests}
+    offset = max([len(test.__name__) for test in tests]) + 5
 
     for bench, f in sorted(results):
-        print(f"Bench {f:20}: {bench:.9f} sec")
+        print(f"Bench {f:{offset}}: {bench:.6f} sec")
+    print()
+
+
+if __name__ == '__main__':
+    suite([
+        bench_xprintidle_cmd,
+        bench_xprintidle_fail_over,
+        bench_xprintidle_cffi,
+        bench_xprintidle_cffi_dyn_import
+    ], n=1000)
+
+    suite([
+        bench_finder_utils,
+        bench_finder_netstat
+    ])
+
+    suite([
+        bench_index,
+        bench_in,
+        bench_re,
+        bench_in_enum,
+        bench_in_cached
+    ], n=100)
