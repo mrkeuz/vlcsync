@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import cmd_utils
+from vlc_pilot import cmd_utils
 
 _idle_fun = None
 

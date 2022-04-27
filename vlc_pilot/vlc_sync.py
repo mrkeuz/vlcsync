@@ -7,9 +7,9 @@ import time
 
 from loguru import logger
 
-from idletools import user_idle_millis
-from utils import print_exc
-from vlc_util import VlcProcs, VlcTimeoutError
+from vlc_pilot.idletools import user_idle_millis
+from vlc_pilot.utils import print_exc
+from vlc_pilot.vlc_util import VlcProcs, VlcTimeoutError
 
 if lvl := os.getenv("DEBUG_LEVEL"):
     logger.remove()
@@ -40,6 +40,7 @@ class Syncer:
                     continue
 
                 if is_changed:
+                    print(f"\nVlc state change detected from {pid=}")
                     self.env.sync_all(state, vlc)
                     return
 
@@ -48,7 +49,7 @@ class Syncer:
 
     def log_with_debounce(self, msg: str, _debounce=5):
         if time.time() > self.next_log:
-            logger.debug(str)
+            logger.debug(msg)
             self.next_log = time.time() + _debounce
 
     def __del__(self):

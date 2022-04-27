@@ -25,7 +25,7 @@ class WindGeom:
 
 
 def rearrange(dev: bool):
-    for wid in out(f"xdotool search --onlyvisible --name 'Медиапроигрыватель VLC'").splitlines():
+    for wid in out(f"xdotool search --onlyvisible --name 'VLC'").splitlines():
         wind_name = out(f"""xdotool getwindowname "{wid}" """)
         # geom = out(f"""xdotool getwindowgeometry "{wid}" """)
         # print(f"  wid {wid} - {wind_name} ({geom})")
@@ -50,11 +50,15 @@ def geom_for_window(window_name: str, dev: True) -> Optional[WindGeom]:
 def geom_list(dev) -> OrderedDict[str, WindGeom]:
     geom = OrderedDict()
     if dev:
-        geom["Data.Channel"] = WindGeom(4520, 100, "400x300")
-        geom["Driver.Tracker"] = WindGeom(3978, 100, "400x300")
-        geom[".+"] = WindGeom(4248, 500, "500x400")
+        geom["Data.Channel"] = WindGeom(4520, 100, "500x400")
+        geom["Driver.Tracker"] = WindGeom(3978, 100, "500x400")
+        geom[".+"] = WindGeom(4248, 550, "600x400")
     else:
         geom["Data.Channel"] = WindGeom(1, 75, "1920x1043")
         geom["Driver.Tracker"] = WindGeom(3841, 75, "1280x987")
         geom[".+"] = WindGeom(1921, 106, "1920x946")
     return geom
+
+
+if __name__ == '__main__':
+    rearrange(True)

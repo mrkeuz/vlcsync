@@ -9,7 +9,7 @@ from typing import Optional
 from cached_property import cached_property_with_ttl
 from loguru import logger
 
-from utils import VlcFinder
+from vlc_pilot.utils import VlcFinder
 
 VLC_IFACE_IP = "127.0.0.42"
 from enum import Enum

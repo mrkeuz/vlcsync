@@ -10,7 +10,8 @@ from typing import Dict
 import psutil
 from psutil import Process
 
-import cmd_utils
+from vlc_pilot import cmd_utils
+import vlc_pilot.cmd_utils
 
 
 class VlcFinder:

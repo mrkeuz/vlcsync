@@ -4,10 +4,9 @@ from typing import Callable, Iterable
 
 import xprintidle
 
-import cmd_utils
-from utils import VlcFinder
-from idletools import user_idle_millis, _xprintidle_cffi, _xprintidle_cmd
-from vlc_util import VLC_IFACE_IP, PlayState
+from vlc_pilot.utils import VlcFinder
+from vlc_pilot.idletools import user_idle_millis, _xprintidle_cffi, _xprintidle_cmd
+from vlc_pilot.vlc_util import VLC_IFACE_IP, PlayState
 
 finder = VlcFinder()
 
