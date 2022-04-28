@@ -12,8 +12,7 @@ vlc --rc-host 127.0.0.42 SomeMedia1.mkv
 vlc --rc-host 127.0.0.42 SomeMedia2.mkv
 vlc --rc-host 127.0.0.42 SomeMedia3.mkv
 
-# vlcsync will find all vlc on 127.0.0.42:*
-# and start sync 
+# vlcsync will find all vlc on 127.0.0.42:* and start syncing 
 vlcsync
 ```
 
