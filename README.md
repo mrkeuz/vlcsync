@@ -1,7 +1,7 @@
-VLC Timeline Sync
-=================
+VLC Sync
+========
 
-Utility for synchronize multiple instances of VLC supports seek, play and pause
+Utility for synchronize multiple instances of VLC. Supports seek, play and pause.
 
 # Run
 
