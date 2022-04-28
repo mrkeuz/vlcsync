@@ -19,5 +19,5 @@ vlcsync
 ## Install
 
 ```shell
-pip3 install -U .
+pip3 install -U git+https://github.com/mrkeuz/vlcsync
 ```
