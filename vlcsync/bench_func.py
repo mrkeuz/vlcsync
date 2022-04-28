@@ -2,11 +2,8 @@ import re
 import timeit
 from typing import Callable, Iterable
 
-import xprintidle
-
-from vlc_pilot.utils import VlcFinder
-from vlc_pilot.idletools import user_idle_millis, _xprintidle_cffi, _xprintidle_cmd
-from vlc_pilot.vlc_util import VLC_IFACE_IP, PlayState
+from vlcsync.utils import VlcFinder
+from vlcsync.vlc_util import VLC_IFACE_IP, PlayState
 
 finder = VlcFinder()
 
@@ -19,14 +16,6 @@ def bench_finder_utils():
 # Prev 0.032
 def bench_finder_netstat():
     finder.find_vlc_netstat(VLC_IFACE_IP)
-
-
-def bench_f(f: Callable, n=10) -> (int, str):
-    assert callable(f), f"Arg {f=} should callable"
-
-    bench = timeit.timeit(f, globals=globals(), number=n) / n
-
-    return bench, f.__name__
 
 
 status = "ioqewufpodia state pause"
@@ -75,22 +64,6 @@ def bench_in_cached(_valid_states=(PlayState.PLAYING.value,
         return PlayState.UNKNOWN
 
 
-def bench_xprintidle_cmd():
-    return _xprintidle_cmd()
-
-
-def bench_xprintidle_cffi():
-    return xprintidle.idle_time()
-
-
-def bench_xprintidle_cffi_dyn_import():
-    return _xprintidle_cffi()
-
-
-def bench_xprintidle_fail_over():
-    return user_idle_millis()
-
-
 def bench_in_enum():
     for pb_state in PlayState:
         # print(pb_state)
@@ -98,6 +71,16 @@ def bench_in_enum():
             return pb_state
     else:
         return PlayState.UNKNOWN
+
+
+def bench_f(f: Callable, n=10) -> (int, str):
+    assert callable(f), f"Arg {f=} should callable"
+    try:
+        bench = timeit.timeit(f, globals=globals(), number=n) / n
+    except NotImplementedError:
+        bench = 0
+
+    return bench, f.__name__
 
 
 def suite(tests: Iterable[Callable], n=10):
@@ -110,13 +93,6 @@ def suite(tests: Iterable[Callable], n=10):
 
 
 if __name__ == '__main__':
-    suite([
-        bench_xprintidle_cmd,
-        bench_xprintidle_fail_over,
-        bench_xprintidle_cffi,
-        bench_xprintidle_cffi_dyn_import
-    ], n=1000)
-
     suite([
         bench_finder_utils,
         bench_finder_netstat

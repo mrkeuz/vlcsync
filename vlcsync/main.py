@@ -7,9 +7,8 @@ import time
 
 from loguru import logger
 
-from vlc_pilot.idletools import user_idle_millis
-from vlc_pilot.utils import print_exc
-from vlc_pilot.vlc_util import VlcProcs, VlcTimeoutError
+from vlcsync.utils import print_exc
+from vlcsync.vlc_util import VlcProcs, VlcTimeoutError
 
 if lvl := os.getenv("DEBUG_LEVEL"):
     logger.remove()
@@ -60,15 +59,14 @@ class Syncer:
 
 
 def main():
-    print("F1 stream syncronizer started...")
+    print("Vlcsync started...")
     time.sleep(2)  # Wait instances
     while True:
         try:
             with Syncer() as s:
                 while True:
-                    if user_idle_millis() < 500:
-                        s.do_sync()
-                        time.sleep(0.05)
+                    s.do_sync()
+                    time.sleep(0.05)
         except KeyboardInterrupt:
             sys.exit(0)
         except:

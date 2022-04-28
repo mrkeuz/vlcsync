@@ -9,7 +9,7 @@ from typing import Optional
 from cached_property import cached_property_with_ttl
 from loguru import logger
 
-from vlc_pilot.utils import VlcFinder
+from vlcsync.utils import VlcFinder
 
 VLC_IFACE_IP = "127.0.0.42"
 from enum import Enum
@@ -24,6 +24,9 @@ class PlayState(Enum):
     @classmethod
     def _missing_(cls, value):
         return PlayState.UNKNOWN
+
+    def __repr__(self):
+        return self.value
 
 
 @dataclass
@@ -137,7 +140,7 @@ class Vlc:
     def _recv_answer(self, sock: socket.socket):
         data = sock.recv(1024)
         timeout = time.time() + 1
-        while not data[-2:] == b"> ":
+        while data[-2:] != b"> ":
             if time.time() > timeout:
                 raise VlcTimeoutError(f"Socket receive answer timeout.", self.pid)
             data += sock.recv(1024)

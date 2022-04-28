@@ -1,25 +1,22 @@
 [tool.poetry]
-name = "vlc-pilot"
+name = "vlcsync"
 version = "0.1.3"
 description = ""
 authors = ["mrkeuz <mrkeuz@users.noreply.github.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-psutil = "*"
 loguru = "*"
+psutil = "*"
 cached-property = "*"
-xprintidle = { version = "^0.2", optional = true }
 
 [tool.poetry.extras]
-xprintidle = ["xprintidle"]
-
 
 [tool.poetry.dev-dependencies]
 profilehooks = "^1.12.0"
 
 [tool.poetry.scripts]
-vlc-pilot = 'vlc_pilot.vlc_sync:main'
+vlcsync = 'vlcsync.main:main'
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
