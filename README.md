@@ -2,7 +2,7 @@ VLC Sync
 ========
 
 Utility for synchronize multiple instances of VLC. Supports seek, play and pause. 
-Inspired by F1 streams with extra driver tracking data streams.  
+Inspired by F1 streams with extra driver tracking data.  
 
 # Run
 
