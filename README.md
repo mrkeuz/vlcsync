@@ -27,7 +27,7 @@ Found instance with pid 3538291 and port 127.0.0.42:45615 State(play_state=playi
 ## Install
 
 ```shell
-pip3 install -U git+https://github.com/mrkeuz/vlcsync
+pip3 install -U vlcsync
 ```
 
 ## Status 
