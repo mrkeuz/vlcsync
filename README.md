@@ -55,8 +55,8 @@ Possible alternatives:
     - Open additional media. Seems feature broken in vlc 3 (also afaik limited only 2 instances)  
     - There is [netsync](https://wiki.videolan.org/Documentation:Modules/netsync/) but seem only master-slave (not tried)
 - [Syncplay](https://github.com/Syncplay/syncplay) - very promised but much [complicated](https://github.com/Syncplay/syncplay/discussions/463) for my task
-- [bino](https://bino3d.org/) - just low fps (not remember witch one)
-- [gridplayer](https://github.com/vzhd1701/gridplayer) one hard control 
+- [bino](https://bino3d.org/) - working, very strange controls, file dialog not working, only fullscreen
+- [gridplayer](https://github.com/vzhd1701/gridplayer) - low fps by some reason
 
 ## Demo
 
