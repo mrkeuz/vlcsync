@@ -2,20 +2,21 @@ import re
 import timeit
 from typing import Callable, Iterable
 
-from vlcsync.utils import VlcFinder
-from vlcsync.vlc_util import VLC_IFACE_IP, PlayState
+from vlcsync.vlc_finder import VlcFinder
+from vlcsync.vlc_util import VLC_IFACE_IP
+from vlcsync.vlc_models import PlayState
 
 finder = VlcFinder()
 
 
 # Ps_utils 0.069
 def bench_finder_utils():
-    finder.find_vlc_psutil(VLC_IFACE_IP)
-
-
-# Prev 0.032
-def bench_finder_netstat():
-    finder.find_vlc_netstat(VLC_IFACE_IP)
+    vlc_ports = {}
+    for p in finder._find_vlc_procs():
+        port = finder._has_listen_port(p, VLC_IFACE_IP)
+        if port:
+            vlc_ports[p.pid] = port
+    vlc_ports
 
 
 status = "ioqewufpodia state pause"
@@ -94,8 +95,7 @@ def suite(tests: Iterable[Callable], n=10):
 
 if __name__ == '__main__':
     suite([
-        bench_finder_utils,
-        bench_finder_netstat
+        bench_finder_utils
     ])
 
     suite([

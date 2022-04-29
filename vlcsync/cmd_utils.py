@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-from functools import cached_property
-import os
+import getpass
 import platform
 import shlex
 import subprocess
-
+from functools import cached_property
 from typing import List
 
 LINUX_ENV = {
     "DISPLAY": ":0",
-    "XDG_RUNTIME_DIR": f"/run/user/{os.getuid()}",
+    "XDG_RUNTIME_DIR": f"/run/user/{getpass.getuser()}",
 }
 
 

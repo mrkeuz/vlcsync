@@ -7,8 +7,9 @@ import time
 
 from loguru import logger
 
-from vlcsync.utils import print_exc
-from vlcsync.vlc_util import VlcProcs, VlcTimeoutError
+from vlcsync.vlc_finder import print_exc
+from vlcsync.vlc_util import VlcProcs
+from vlcsync.vlc_models import VlcConnectionError
 
 if lvl := os.getenv("DEBUG_LEVEL"):
     logger.remove()
@@ -43,7 +44,7 @@ class Syncer:
                     self.env.sync_all(state, vlc)
                     return
 
-        except VlcTimeoutError as e:
+        except VlcConnectionError as e:
             self.env.dereg(e.pid)
 
     def log_with_debounce(self, msg: str, _debounce=5):

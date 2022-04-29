@@ -1,98 +1,40 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from functools import cached_property
 import socket
 import time
-from typing import Optional
 
 from cached_property import cached_property_with_ttl
 from loguru import logger
 
-from vlcsync.utils import VlcFinder
+from vlcsync.vlc_finder import VlcFinder
+from vlcsync.vlc_conn import VlcConn
+
+from vlcsync.vlc_models import PlayState, State
 
 VLC_IFACE_IP = "127.0.0.42"
-from enum import Enum
 
-
-class PlayState(Enum):
-    PLAYING = "playing"
-    STOPPED = "stopped"
-    PAUSED = "paused"
-    UNKNOWN = None
-
-    @classmethod
-    def _missing_(cls, value):
-        return PlayState.UNKNOWN
-
-    def __repr__(self):
-        return self.value
-
-
-@dataclass
-class State:
-    play_state: PlayState
-    seek: int
-    time_diff: float = field(repr=False)
-
-    def same(self, other: State):
-        return (self.same_play_state(other) and
-                (
-                        self.play_in_same_pos(other) or
-                        self.pause_is_same_pos(other) or
-                        self.both_stopped(other)
-                )
-                )
-
-    def same_play_state(self, other: State):
-        return self.play_state == other.play_state
-
-    def pause_is_same_pos(self: State, other: State):
-        return self.play_state == other.play_state == PlayState.PAUSED and self.seek == other.seek
-
-    def play_in_same_pos(self: State, other: State):
-        """ Check time_diff only when play """
-        return (
-                self.play_state == other.play_state == PlayState.PLAYING and
-                self.time_diff and other.time_diff and
-                abs(self.time_diff - other.time_diff) < 2
-        )
-
-    def both_stopped(self, other: State):
-        return self.play_state == other.play_state == PlayState.STOPPED
-
-    def is_active(self):
-        return self.play_state in [PlayState.PLAYING, PlayState.PAUSED]
+socket.setdefaulttimeout(0.5)
 
 
 class Vlc:
     def __init__(self, pid, port):
         self.pid = pid
         self._port = port
+        self.vlc_conn = VlcConn(VLC_IFACE_IP, port, pid)
         self.prev_state: State = self.cur_state()
 
     def play_state(self) -> PlayState:
-        status = self._vlc_cmd("status")
+        status = self.vlc_conn.cmd("status")
         return self._extract_state(status)
-
-    @staticmethod
-    def _extract_state(status, _valid_states=(PlayState.PLAYING.value,
-                                              PlayState.PAUSED.value,
-                                              PlayState.STOPPED.value)):
-        for pb_state in _valid_states:
-            if pb_state in status:
-                return PlayState(pb_state)
-        else:
-            return PlayState.UNKNOWN
 
     def get_time(self) -> int | None:
         logger.trace("Request get_time from {0}", self._port)
-        seek = self._vlc_cmd("get_time")
+        seek = self.vlc_conn.cmd("get_time")
         if seek != '':
             return int(seek)
 
-    def seek(self, seek):
-        self._vlc_cmd(f"seek {seek}")
+    def seek(self, seek: int):
+        self.vlc_conn.cmd(f"seek {seek}")
 
     def cur_state(self) -> State:
         get_time = self.get_time()
@@ -102,11 +44,12 @@ class Vlc:
                      time.time() - (get_time or 0))
 
     def is_state_change(self) -> (bool, State):
-        state = self.cur_state()
-        is_change = not state.same(self.prev_state)
+        cur_state: State = self.cur_state()
+        prev_state: State = self.prev_state
+        is_change = not cur_state.same(prev_state)
 
-        # Return state for reduce further socket communications
-        return is_change, state
+        # Return cur_state for reduce further socket communications
+        return is_change, cur_state
 
     def sync_to(self, new_state: State, source: Vlc):
         if not new_state.is_active():
@@ -122,58 +65,42 @@ class Vlc:
         if source != self or cur_play_state == PlayState.PLAYING:
             self.seek(new_state.seek)
 
-        self.prev_state = new_state
+        self.prev_state = self.cur_state()
 
     def pause_if_play(self, new_state, cur_play_state):
         if cur_play_state == PlayState.PLAYING and new_state.play_state == PlayState.PAUSED:
-            self._vlc_cmd("pause")
+            self.vlc_conn.cmd("pause")
 
     def play_if_pause(self, new_state, cur_play_state):
         if cur_play_state == PlayState.PAUSED and new_state.play_state == PlayState.PLAYING:
-            self._vlc_cmd("play")
+            self.vlc_conn.cmd("play")
 
-    def _vlc_cmd(self, command: str) -> str:
-        self._s.send(f"{command}\r\n".encode())
-        data = self._recv_answer(self._s)
-        return data.decode().replace("> ", "").replace("\r\n", "")
-
-    def _recv_answer(self, sock: socket.socket):
-        data = sock.recv(1024)
-        timeout = time.time() + 1
-        while data[-2:] != b"> ":
-            if time.time() > timeout:
-                raise VlcTimeoutError(f"Socket receive answer timeout.", self.pid)
-            data += sock.recv(1024)
-        return data
-
-    @cached_property
-    def _s(self) -> socket.socket:
-        logger.trace("Connect {0}", self._port)
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((VLC_IFACE_IP, self._port))
-        self._recv_answer(sock)
-        return sock
+    @staticmethod
+    def _extract_state(status, _valid_states=(PlayState.PLAYING.value,
+                                              PlayState.PAUSED.value,
+                                              PlayState.STOPPED.value)):
+        for pb_state in _valid_states:
+            if pb_state in status:
+                return PlayState(pb_state)
+        else:
+            return PlayState.UNKNOWN
 
     def __repr__(self):
         return f"Vlc({self.pid=}, {self._port=}, {self.prev_state=})"
 
     def close(self):
-        logger.trace("Close socket {0}...", self._port)
-        try:
-            self._s.close()
-        except:
-            pass
+        self.vlc_conn.close()
 
 
 class VlcProcs:
     def __init__(self):
-        self.main_vlc: Optional[Vlc] = None
         self._vlc_instances: dict[int, Vlc] = {}
         self.vlcFinder = VlcFinder()
 
-    @cached_property_with_ttl(ttl=2)
+    @cached_property_with_ttl(ttl=5)
     def all_vlc(self) -> dict[int, Vlc]:
-        logger.trace("Compute all_vlc...")
+        start = time.time()
+
         vlc_in_system = self.vlcFinder.find_vlc(VLC_IFACE_IP)
 
         # Remove missed
@@ -187,6 +114,7 @@ class VlcProcs:
                 print(f"Found instance with pid {pid} and port {VLC_IFACE_IP}:{port} {vlc.cur_state()}")
                 self._vlc_instances[pid] = vlc
 
+        logger.debug(f"Compute all_vlc (took {time.time() - start:.3f})...")
         return self._vlc_instances
 
     def sync_all(self, state: State, source: Vlc):
@@ -194,6 +122,7 @@ class VlcProcs:
         logger.debug(f"Detect change to {state} from {source.pid}")
         logger.debug(f" old --> {source.prev_state} ")
         logger.debug(f" new --> {state} ")
+        logger.debug(f" Time diff abs(old - new) {abs(state.time_diff - source.prev_state.time_diff)}")
         logger.debug("<" * 60)
         logger.debug("")
         print(">>> Sync windows...")
@@ -220,9 +149,3 @@ class VlcProcs:
 
     def __del__(self):
         self.close()
-
-
-class VlcTimeoutError(TimeoutError):
-    def __init__(self, msg: str, pid: int):
-        super().__init__(msg)
-        self.pid = pid
