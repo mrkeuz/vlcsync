@@ -1,8 +1,25 @@
 [tool.poetry]
 name = "vlcsync"
-version = "0.1.3"
-description = ""
+version = "0.1.4"
+description = "Utility for synchronize multiple instances of VLC. Supports seek, play and pause. "
 authors = ["mrkeuz <mrkeuz@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/mrkeuz/vlcsync/"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: Multimedia",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Multimedia :: Video :: Display",
+    "Topic :: Utilities"
+]
+
+[tool.poetry.urls]
+"Documentation" = "https://github.com/mrkeuz/vlcsync/"
 
 [tool.poetry.dependencies]
 python = "^3.8"
