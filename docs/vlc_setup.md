@@ -3,16 +3,17 @@ Setup VLC instances
 
 `Vlcsync` assumes that `vlc` start with enabled "Remote control interface" (tcp) on address `127.0.0.42` 
 
-This allows you to automatically look for running `vlc` instances by simply looking listening ports. 
+This allows you to automatically find running `vlc` instances by simply looking listening ports. 
 Each instance of the program will run on a random port, but with a unique address `127.0.0.42:*`
 
 You have next options how to configure `vlc` for this:
 
 - Run vlc from command line with option `vlc --rc-host 127.0.0.42`
-- Set via gui preferences (need restart `vlc` after save settings)
+- Set via gui preferences, suitable for Windows, tested on Win 10   
+  (need restart `vlc` after save settings)
 
   ![Set address](vlc_pref_1.png)
-
+  
   ![Enable interface](vlc_pref_2.png)
 
 In success case a program show you "Found instances" at start: 
@@ -26,7 +27,7 @@ In success case a program show you "Found instances" at start:
   $ netstat -4nlpt | grep 127.0.0.42
   ```
   
-- You can connect to `vlc` via `telnet` (or i.e. `putty`) and enter commands manually from keyboard:
+- You can connect to `vlc` via `telnet` (or i.e. `putty` with raw mode) and enter commands manually from keyboard:
   ```shell
   $ telnet 127.0.0.42 12345
   
