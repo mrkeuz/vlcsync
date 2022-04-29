@@ -32,7 +32,7 @@ pip3 install -U vlcsync
 
 ## Status 
 
-In development. Tested on Linux, but should also work on Win/macOS.
+In development. Tested on Linux, Windows 10 (macOS should also work).
 
 Any thoughts, ideas and contributions welcome!
 
@@ -43,6 +43,6 @@ Roadmap:
 
 ## Demo
 
-![](./docs/vlcsync.gif)
+![vlcsync](./docs/vlcsync.gif)
 
 Enjoy! 🚀
