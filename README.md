@@ -4,6 +4,11 @@ VLC Sync
 Utility for synchronize multiple instances of VLC. Supports seek, play and pause. 
 Inspired by F1 streams with extra driver tracking data.  
 
+Motivation:
+
+Did [not find](#alternatives) reasonable alternative for Linux. 
+So decided to write my own solution.
+
 # Run
 
 `Vlc` instances should expose "Remote control interface" on 127.0.0.42 (see [how configure vlc](./docs/vlc_setup.md))
@@ -40,6 +45,18 @@ Roadmap:
 
 - [ ] Add ability to set static addresses i.e. for remote sync (to external pc/screen)
 - [ ] Add portable `*.exe` build for Windows
+- [ ] Automatic tune vlc [config](https://wiki.videolan.org/Preferences/#:~:text=Configuration%20File&text=Windows%3A%20%25appdata%25%5Cvlc%5C,%5CApplication%20Data%5Cvlc%5Cvlcrc) file for correct expose
+
+## Alternatives
+
+Possible alternatives:
+
+- [vlc](https://www.videolan.org/vlc/index.ru.html) 
+    - Open additional media. Seems feature broken in vlc 3 (also afaik limited only 2 instances)  
+    - There is [netsync](https://wiki.videolan.org/Documentation:Modules/netsync/) but seem only master-slave (not tried)
+- [Syncplay](https://github.com/Syncplay/syncplay) - very promised but much [complicated](https://github.com/Syncplay/syncplay/discussions/463) for my task
+- [bino](https://bino3d.org/) - just low fps (not remember witch one)
+- [gridplayer](https://github.com/vzhd1701/gridplayer) one hard control 
 
 ## Demo
 
