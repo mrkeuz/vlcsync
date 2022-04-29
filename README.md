@@ -38,7 +38,7 @@ Any thoughts, ideas and contributions welcome!
 
 Roadmap:
 
-- [ ] Add ability to set static address i.e. for remote sync (on external pc/screen)
+- [ ] Add ability to set static addresses i.e. for remote sync (to external pc/screen)
 - [ ] Add portable `*.exe` build for Windows
 
 ## Demo
