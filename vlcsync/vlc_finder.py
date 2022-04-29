@@ -22,9 +22,6 @@ def skip_on_error():
 
 
 class VlcFinder:
-    def __init__(self):
-        self.netstat_fail = False
-
     def find_vlc(self, iface) -> Dict[int, int]:
         vlc_ports = {}
 
