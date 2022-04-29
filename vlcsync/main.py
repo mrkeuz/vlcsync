@@ -8,8 +8,8 @@ import time
 from loguru import logger
 
 from vlcsync.vlc_finder import print_exc
-from vlcsync.vlc_util import VlcProcs
-from vlcsync.vlc_models import VlcConnectionError
+from vlcsync.vlc_util import VlcProcs, Vlc
+from vlcsync.vlc_models import VlcConnectionError, State, PlayState
 
 if lvl := os.getenv("DEBUG_LEVEL"):
     logger.remove()
@@ -35,17 +35,36 @@ class Syncer:
         self.log_with_debounce("Sync...")
         try:
             for pid, vlc in self.env.all_vlc.items():
-                is_changed, state = vlc.is_state_change()
-                if not state.is_active():
+                prev_state = vlc.prev_state
+                is_changed, cur_state = vlc.is_state_change()
+                if not cur_state.is_active():
                     continue
+
+                if is_changed and self.just_opened(prev_state, cur_state):
+                    """ Corner case for just OPEN FILE"""
+
+                    # Find already played and sync from them
+                    for other_vlc in self.env.all_vlc.values():
+                        other_vlc: Vlc
+                        if vlc != other_vlc:
+                            # Back synchronization
+                            print(f"\nFound just started vlc {pid=} and sync align others")
+                            self.env.sync_all(other_vlc.cur_state(), other_vlc)
+                            return
 
                 if is_changed:
                     print(f"\nVlc state change detected from {pid=}")
-                    self.env.sync_all(state, vlc)
+                    self.env.sync_all(cur_state, vlc)
                     return
 
         except VlcConnectionError as e:
             self.env.dereg(e.pid)
+
+    @staticmethod
+    def just_opened(old: State, new: State) -> bool:
+        """  old --> State(play_state=stopped, seek=None)
+             new --> State(play_state=playing, seek=0) """
+        return old.play_state == PlayState.STOPPED and new.is_active() and 0 <= new.seek <= 2
 
     def log_with_debounce(self, msg: str, _debounce=5):
         if time.time() > self.next_log:
@@ -57,6 +76,8 @@ class Syncer:
 
     def close(self):
         self.env.close()
+
+
 
 
 def main():

@@ -63,6 +63,7 @@ class Vlc:
 
         # Sync all secondary, but main only when playing
         if source != self or cur_play_state == PlayState.PLAYING:
+            logger.debug(f"Sync -> Seek {new_state.seek}")
             self.seek(new_state.seek)
 
         self.prev_state = self.cur_state()
