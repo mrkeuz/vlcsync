@@ -15,12 +15,13 @@ So decided to write my own solution.
 
 ```shell
 
-# Run vlc (should with open --rc-host 127.0.0.42 option) 
+# Run vlc players 
+# Should open with --rc-host 127.0.0.42 option or configured properly from gui 
 $ vlc --rc-host 127.0.0.42 SomeMedia1.mkv &
 $ vlc --rc-host 127.0.0.42 SomeMedia2.mkv &
 $ vlc --rc-host 127.0.0.42 SomeMedia3.mkv &
 
-# vlcsync will find all vlc on 127.0.0.42:* and start syncing 
+# Vlcsync will monitor all opened vlc players and do syncing in background 
 $ vlcsync
 
 Vlcsync started...
