@@ -55,7 +55,7 @@ Possible alternatives:
 - [vlc](https://www.videolan.org/vlc/index.ru.html) 
     - Open additional media. Seems feature broken in vlc 3 (also afaik limited only 2 instances)  
     - There is a [netsync](https://wiki.videolan.org/Documentation:Modules/netsync/) but seem only master-slave (not tried)
-- [Syncplay](https://github.com/Syncplay/syncplay) - very promised, but much [complicated](https://github.com/Syncplay/syncplay/discussions/463) for my case
+- [Syncplay](https://github.com/Syncplay/syncplay) - very promised, but little [complicated](https://github.com/Syncplay/syncplay/discussions/463) for my case
 - [bino](https://bino3d.org/) - working, very strange controls, file dialog not working, only fullscreen
 - [gridplayer](https://github.com/vzhd1701/gridplayer) - low fps by some reason
 
