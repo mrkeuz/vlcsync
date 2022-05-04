@@ -38,7 +38,7 @@ pip3 install -U vlcsync
 
 ## Status 
 
-In development. Tested on Linux, Windows 10 (macOS should also work).
+In development. Tested on Linux, Windows 7/10 (macOS should also work).
 
 Any thoughts, ideas and contributions welcome!
 
