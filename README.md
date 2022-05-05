@@ -11,10 +11,6 @@ So decided to write my own solution.
 
 Currently, tested on Linux, Windows 7/10 (macOS should also work).
 
-## Demo
-
-![vlcsync](./docs/vlcsync.gif)
-
 ## Install
 
 ```shell
@@ -39,6 +35,10 @@ $ vlc --rc-host 127.0.0.42 SomeMedia3.mkv &
 # Vlcsync will monitor all opened vlc players and do syncing in background 
 $ vlcsync
 ```
+
+## Demo
+
+![vlcsync](./docs/vlcsync.gif)
 
 ## Alternatives
 
