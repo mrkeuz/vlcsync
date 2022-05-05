@@ -9,26 +9,11 @@ Motivation:
 Did [not find](#alternatives) reasonable alternative for Linux. 
 So decided to write my own solution.
 
-# Run
+Currently, tested on Linux, Windows 7/10 (macOS should also work).
 
-`Vlc` instances should expose "Remote control interface" on 127.0.0.42 (see [how configure vlc](./docs/vlc_setup.md))
+## Demo
 
-```shell
-
-# Run vlc players 
-# Should open with --rc-host 127.0.0.42 option or configured properly from gui 
-$ vlc --rc-host 127.0.0.42 SomeMedia1.mkv &
-$ vlc --rc-host 127.0.0.42 SomeMedia2.mkv &
-$ vlc --rc-host 127.0.0.42 SomeMedia3.mkv &
-
-# Vlcsync will monitor all opened vlc players and do syncing in background 
-$ vlcsync
-
-Vlcsync started...
-Found instance with pid 3538289 and port 127.0.0.42:34759 State(play_state=playing, seek=10)
-Found instance with pid 3538290 and port 127.0.0.42:38893 State(play_state=playing, seek=10)
-Found instance with pid 3538291 and port 127.0.0.42:45615 State(play_state=playing, seek=10)
-```
+![vlcsync](./docs/vlcsync.gif)
 
 ## Install
 
@@ -36,31 +21,36 @@ Found instance with pid 3538291 and port 127.0.0.42:45615 State(play_state=playi
 pip3 install -U vlcsync
 ```
 
-## Status 
+or 
 
-In development. Tested on Linux, Windows 7/10 (macOS should also work).
+Download [binary release](https://github.com/mrkeuz/vlcsync/releases) (Windows)
 
-Any thoughts, ideas and contributions welcome!
+## Run
 
-Roadmap:
+`Vlc` players should open with `--rc-host 127.0.0.42` option or configured properly from gui (see [how configure vlc](./docs/vlc_setup.md)) 
 
-- [x] Add portable `*.exe` build for Windows
-- [ ] Add ability to set static addresses i.e. for remote sync (for support external pc)
-- [ ] Automatic tune vlc [config](https://wiki.videolan.org/Preferences/#:~:text=Configuration%20File&text=Windows%3A%20%25appdata%25%5Cvlc%5C,%5CApplication%20Data%5Cvlc%5Cvlcrc) file for correct expose
+```shell
+
+# Run vlc players 
+$ vlc --rc-host 127.0.0.42 SomeMedia1.mkv &
+$ vlc --rc-host 127.0.0.42 SomeMedia2.mkv &
+$ vlc --rc-host 127.0.0.42 SomeMedia3.mkv &
+
+# Vlcsync will monitor all opened vlc players and do syncing in background 
+$ vlcsync
+```
 
 ## Alternatives
-
-Possible alternatives:
 
 - [vlc](https://www.videolan.org/vlc/index.ru.html) 
     - Open additional media. Seems feature broken in vlc 3 (also afaik limited only 2 instances)  
     - There is a [netsync](https://wiki.videolan.org/Documentation:Modules/netsync/) but seem only master-slave (not tried)
 - [Syncplay](https://github.com/Syncplay/syncplay) - very promised, but little [complicated](https://github.com/Syncplay/syncplay/discussions/463) for my case
-- [bino](https://bino3d.org/) - working, very strange controls, file dialog not working, only fullscreen
+- [bino](https://bino3d.org/) - working, buy very strange controls, file dialog not working and only fullscreen
 - [gridplayer](https://github.com/vzhd1701/gridplayer) - low fps by some reason
 
-## Demo
+## Contributing
 
-![vlcsync](./docs/vlcsync.gif)
+Any thoughts, ideas and contributions welcome!  
 
 Enjoy! 🚀
