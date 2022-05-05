@@ -23,7 +23,7 @@ Download [binary release](https://github.com/mrkeuz/vlcsync/releases) (Windows)
 
 ## Run
 
-`Vlc` players should open with `--rc-host 127.0.0.42` option or configured properly from gui (see [how configure vlc](./docs/vlc_setup.md)) 
+`Vlc` players should open with `--rc-host 127.0.0.42` option OR configured properly from gui (see [how configure vlc](./docs/vlc_setup.md)) 
 
 ```shell
 
@@ -32,7 +32,7 @@ $ vlc --rc-host 127.0.0.42 SomeMedia1.mkv &
 $ vlc --rc-host 127.0.0.42 SomeMedia2.mkv &
 $ vlc --rc-host 127.0.0.42 SomeMedia3.mkv &
 
-# Vlcsync will monitor all opened vlc players and do syncing in background 
+# Vlcsync will monitor all vlc players and do syncing 
 $ vlcsync
 ```
 
