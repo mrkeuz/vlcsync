@@ -24,9 +24,8 @@ class Syncer:
         self.env = VlcProcs()
 
     def __enter__(self):
-        syncer = Syncer()
-        syncer.do_sync()
-        return syncer
+        self.do_sync()
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
