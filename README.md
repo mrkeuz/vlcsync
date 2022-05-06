@@ -41,7 +41,7 @@ $ vlcsync
 ## Limitations 
 
 - Frame-to-frame sync NOT provided. `vlc` does not have precise controlling via `rc` interface out of box. 
-  Difference between videos can be **up to ~0.5 seconds** in worst case. Especially play from network share, 
+  Difference between videos can be **up to ~0.5 seconds** in worst case. Especially when playing from network share, 
   due buffering time and network latency.
 
 - Currently, tested only on:
