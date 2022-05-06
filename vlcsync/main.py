@@ -20,7 +20,7 @@ else:
 
 class Syncer:
     def __init__(self):
-        self.next_log = 0
+        self.supress_log_until = 0
         self.env = VlcProcs()
 
     def __enter__(self):
@@ -48,9 +48,9 @@ class Syncer:
             self.env.dereg(e.pid)
 
     def log_with_debounce(self, msg: str, _debounce=5):
-        if time.time() > self.next_log:
+        if time.time() > self.supress_log_until:
             logger.debug(msg)
-            self.next_log = time.time() + _debounce
+            self.supress_log_until = time.time() + _debounce
 
     def __del__(self):
         self.close()
