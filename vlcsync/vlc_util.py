@@ -29,7 +29,6 @@ class Vlc:
         return self._extract_state(status)
 
     def get_time(self) -> int | None:
-        logger.trace("Request get_time from {0}", self._port)
         seek = self.vlc_conn.cmd("get_time")
         if seek != '':
             return int(seek)

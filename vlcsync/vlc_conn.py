@@ -21,9 +21,12 @@ class VlcConn:
         self._recv_answer()
 
     def cmd(self, command: str) -> str:
+        logger.trace(f">>> Send {command=} to {self.pid=}")
         self.sock.send(f"{command}\r\n".encode())
         data = self._recv_answer()
-        return data.decode().replace("> ", "").replace("\r\n", "")
+        answer = data.decode().replace("> ", "").replace("\r\n", "")
+        logger.trace(f"<<< Receive {answer=} from {self.pid=}")
+        return answer
 
     def _recv_answer(self):
         data = b''
