@@ -17,6 +17,7 @@ class VlcConn:
         self.host = host
         logger.trace("Connect {0}", port)
         self.sock = socket.create_connection((host, self.port))
+        self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self._recv_answer()
 
     def cmd(self, command: str) -> str:
@@ -35,7 +36,7 @@ class VlcConn:
 
         except ConnectionAbortedError:
             raise VlcConnectionError(f"Socket lost connection", self.pid)
-        except (socket.timeout, TimeoutError):
+        except (socket.timeout, TimeoutError, OSError):
             logger.trace(f"Data when timeout {data}")
             raise VlcConnectionError(f"Socket receive answer native timeout.", self.pid)
 

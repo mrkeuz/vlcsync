@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import socket
+import threading
 import time
 
 from cached_property import cached_property_with_ttl
@@ -94,28 +95,36 @@ class Vlc:
 
 class VlcProcs:
     def __init__(self):
+        self.closed = False
         self._vlc_instances: dict[int, Vlc] = {}
         self.vlcFinder = VlcFinder()
+        self.vlc_finder_thread = threading.Thread(target=self.refresh_vlc_list_periodically, daemon=True)
+        self.vlc_finder_thread.start()
 
-    @cached_property_with_ttl(ttl=5)
+    def refresh_vlc_list_periodically(self):
+        while not self.closed:
+            start = time.time()
+
+            vlc_in_system = self.vlcFinder.find_vlc(VLC_IFACE_IP)
+            logger.debug(vlc_in_system)
+
+            # Remove missed
+            for missed_pid in (self._vlc_instances.keys() - vlc_in_system.keys()):
+                self.dereg(missed_pid)
+
+            # Populate if not exists
+            for pid, port in vlc_in_system.items():
+                if pid not in self._vlc_instances.keys():
+                    vlc = Vlc(pid, port)
+                    print(f"Found instance with pid {pid} and port {VLC_IFACE_IP}:{port} {vlc.cur_state()}")
+                    self._vlc_instances[pid] = vlc
+
+            logger.debug(f"Compute all_vlc (took {time.time() - start:.3f})...")
+            time.sleep(5)
+
+    @property
     def all_vlc(self) -> dict[int, Vlc]:
-        start = time.time()
-
-        vlc_in_system = self.vlcFinder.find_vlc(VLC_IFACE_IP)
-
-        # Remove missed
-        for missed_pid in (self._vlc_instances.keys() - vlc_in_system.keys()):
-            self.dereg(missed_pid)
-
-        # Populate if not exists
-        for pid, port in vlc_in_system.items():
-            if pid not in self._vlc_instances.keys():
-                vlc = Vlc(pid, port)
-                print(f"Found instance with pid {pid} and port {VLC_IFACE_IP}:{port} {vlc.cur_state()}")
-                self._vlc_instances[pid] = vlc
-
-        logger.debug(f"Compute all_vlc (took {time.time() - start:.3f})...")
-        return self._vlc_instances
+        return self._vlc_instances.copy()  # For thread safe
 
     def sync_all(self, state: State, source: Vlc):
         logger.debug(">" * 60)
@@ -145,6 +154,7 @@ class VlcProcs:
         for vlc in self._vlc_instances.values():
             vlc.close()
 
+        self.closed = True
         self._vlc_instances.clear()
 
     def __del__(self):
