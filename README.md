@@ -2,12 +2,12 @@ VLC Sync
 ========
 
 Utility for synchronize multiple instances of VLC. Supports seek, play and pause. 
-Inspired by F1 streams with extra driver tracking data.  
+  
 
-Motivation:
+#### Motivation
 
-Did [not find](#alternatives) reasonable alternative for Linux. 
-So decided to write my own solution.
+Strongly inspired by F1 streams with extra driver tracking data.  
+Did [not find](#alternatives) reasonable alternative for Linux. So decided to write my own solution.
 
 ## Install
 
@@ -17,7 +17,7 @@ pip3 install -U vlcsync
 
 or 
 
-Download [binary release](https://github.com/mrkeuz/vlcsync/releases) (Windows)
+download [binary release](https://github.com/mrkeuz/vlcsync/releases) for Windows 7/10
 
 ## Run
 
@@ -57,6 +57,7 @@ $ vlcsync
 - [Syncplay](https://github.com/Syncplay/syncplay) - very promised, but little [complicated](https://github.com/Syncplay/syncplay/discussions/463) for my case
 - [bino](https://bino3d.org/) - working, buy very strange controls, file dialog not working and only fullscreen
 - [gridplayer](https://github.com/vzhd1701/gridplayer) - low fps by some reason
+- [mpv](https://github.com/mpv-player/mpv) - with [mixing multiple videos](https://superuser.com/a/1325668/1272472) in one window. Unfortunally does not support multiple screens
 
 ## Contributing
 
