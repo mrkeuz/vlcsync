@@ -9,8 +9,6 @@ Motivation:
 Did [not find](#alternatives) reasonable alternative for Linux. 
 So decided to write my own solution.
 
-Currently, tested on Linux, Windows 7/10 (macOS should also work).
-
 ## Install
 
 ```shell
@@ -40,11 +38,22 @@ $ vlcsync
 
 ![vlcsync](./docs/vlcsync.gif)
 
+## Limitations 
+
+- Frame-to-frame sync NOT provided. `vlc` does not have precise controlling via `rc` interface out of box. 
+  Difference between videos can be **up to ~0.5 seconds** in worst case. Especially play from network share, 
+  due buffering time and network latency.
+
+- Currently, tested only on:
+  - Linux (Ubuntu 20.04)
+  - Windows 7 (32-bit)
+  - Windows 10 (64-bit)
+
 ## Alternatives
 
 - [vlc](https://www.videolan.org/vlc/index.ru.html) 
+    - There is a [netsync](https://wiki.videolan.org/Documentation:Modules/netsync/) but seem only master-slave (tried, but not working by some reeason)
     - Open additional media. Seems feature broken in vlc 3 (also afaik limited only 2 instances)  
-    - There is a [netsync](https://wiki.videolan.org/Documentation:Modules/netsync/) but seem only master-slave (not tried)
 - [Syncplay](https://github.com/Syncplay/syncplay) - very promised, but little [complicated](https://github.com/Syncplay/syncplay/discussions/463) for my case
 - [bino](https://bino3d.org/) - working, buy very strange controls, file dialog not working and only fullscreen
 - [gridplayer](https://github.com/vzhd1701/gridplayer) - low fps by some reason
