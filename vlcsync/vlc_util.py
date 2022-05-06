@@ -147,7 +147,8 @@ class VlcProcs:
 
     def dereg(self, pid: int):
         print(f"Detect vlc instance closed pid {pid}")
-        self._vlc_instances.pop(pid).close()
+        if vlc_to_close := self._vlc_instances.pop(pid, None):
+            vlc_to_close.close()
 
     def close(self):
         for vlc in self._vlc_instances.values():
