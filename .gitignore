@@ -1,6 +1,6 @@
 poetry.lock
 profile_report.log
-
+.benchmarks/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
