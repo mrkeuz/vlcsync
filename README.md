@@ -61,6 +61,8 @@ $ vlcsync
 
 ## Contributing
 
-Any thoughts, ideas and contributions welcome!  
+Any thoughts, ideas and contributions welcome!
+
+Special thanks for **KorDen32** for inspiration! 😉
 
 Enjoy! 🚀
