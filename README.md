@@ -63,6 +63,6 @@ $ vlcsync
 
 Any thoughts, ideas and contributions welcome!
 
-Special thanks for **KorDen32** for inspiration! 😉
+Special thanks to **KorDen32** for inspiration! 😉
 
 Enjoy! 🚀
