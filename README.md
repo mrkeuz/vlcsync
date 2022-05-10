@@ -17,7 +17,7 @@ pip3 install -U vlcsync
 
 or 
 
-download [binary release](https://github.com/mrkeuz/vlcsync/releases) for Windows 7/10
+- Download [binary release](https://github.com/mrkeuz/vlcsync/releases) for Windows 7/10
 
 ## Run
 
