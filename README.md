@@ -63,6 +63,6 @@ $ vlcsync
 
 Any thoughts, ideas and contributions welcome!
 
-Special thanks to **KorDen32** for inspiration! 😉
+Special thanks to **KorDen32** for inspiration! <img src="./docs/F1.svg" alt="F1" width="45"/>
 
 Enjoy! 🚀
