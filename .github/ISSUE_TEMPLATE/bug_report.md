@@ -23,10 +23,11 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. Windows 7-62]
+**Environment (please complete the following information):**
+ - OS: [e.g. Windows 7 (32-bit), macOS ..., Linux]
  - Version: [e.g. 22]
- - Installated by: Binary, pip, sources
+ - Python version 
+ - Installed by: Binary, pip, sources
 
 **Additional context**
 Add any other context about the problem here.
