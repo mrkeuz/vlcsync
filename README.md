@@ -58,6 +58,7 @@ $ vlcsync
 - [bino](https://bino3d.org/) - working, buy very strange controls, file dialog not working and only fullscreen
 - [gridplayer](https://github.com/vzhd1701/gridplayer) - low fps by some reason
 - [mpv](https://github.com/mpv-player/mpv) - with [mixing multiple videos](https://superuser.com/a/1325668/1272472) in one window. Unfortunally does not support multiple screens
+- [AVPlayer](http://www.awesomevideoplayer.com/) - only Win, macOS, up to 4 videos in free version
 
 ## Contributing
 
