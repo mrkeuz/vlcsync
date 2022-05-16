@@ -54,7 +54,7 @@ $ vlcsync
 - [vlc](https://www.videolan.org/vlc/index.ru.html) 
     - There is a [netsync](https://wiki.videolan.org/Documentation:Modules/netsync/) but seem only master-slave (tried, but not working by some reeason)
     - Open additional media. Seems feature broken in vlc 3 (also afaik limited only 2 streams)  
-- [Syncplay](https://github.com/Syncplay/syncplay) - very promised, but little [complicated](https://github.com/Syncplay/syncplay/discussions/463) for my case
+- [Syncplay](https://github.com/Syncplay/syncplay) - very promised, but little [complicated](https://github.com/Syncplay/syncplay/discussions/463) for sync different videos
 - [bino](https://bino3d.org/) - working, buy very strange controls, file dialog not working and only fullscreen
 - [gridplayer](https://github.com/vzhd1701/gridplayer) - low fps by some reason
 - [mpv](https://github.com/mpv-player/mpv) - with [mixing multiple videos](https://superuser.com/a/1325668/1272472) in one window. Unfortunally does not support multiple screens
