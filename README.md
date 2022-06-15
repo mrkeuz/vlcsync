@@ -6,8 +6,7 @@ Utility for synchronize multiple instances of VLC. Supports seek, play and pause
 
 #### Motivation
 
-Strongly inspired by F1 streams with extra driver tracking data streams.  
-Did [not find](#alternatives) reasonable alternative for Linux. So decided to write my own solution.
+Strongly inspired by F1 streams with extra driver tracking data streams. Did [not find](#alternatives) reasonable alternative for Linux. So decided to write my own solution.
 
 ## Install
 
@@ -30,7 +29,7 @@ $ vlc --rc-host 127.0.0.42 SomeMedia1.mkv &
 $ vlc --rc-host 127.0.0.42 SomeMedia2.mkv &
 $ vlc --rc-host 127.0.0.42 SomeMedia3.mkv &
 
-# Vlcsync will monitor all vlc players and do syncing 
+# Vlcsync will monitor and syncing all vlc players
 $ vlcsync
 ```
 
