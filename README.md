@@ -29,7 +29,7 @@ $ vlc --rc-host 127.0.0.42 SomeMedia1.mkv &
 $ vlc --rc-host 127.0.0.42 SomeMedia2.mkv &
 $ vlc --rc-host 127.0.0.42 SomeMedia3.mkv &
 
-# Vlcsync will monitor and syncing all vlc players
+# vlcsync will monitor and syncing all vlc players
 $ vlcsync
 ```
 
