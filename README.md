@@ -16,7 +16,9 @@ pip3 install -U vlcsync
 
 or 
 
-- Download [binary release](https://github.com/mrkeuz/vlcsync/releases) for Windows 7/10
+- Download [binary release](https://github.com/mrkeuz/vlcsync/releases) for Windows 7/10  
+  NOTE: On some systems there are false positive Antivirus warnings [issues](https://github.com/mrkeuz/vlcsync/issues/1).
+  In this case use [alternative way](./docs/install.md#windows-detailed-instructions) to install.   
 
 ## Run
 
