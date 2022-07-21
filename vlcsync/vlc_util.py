@@ -9,7 +9,7 @@ from loguru import logger
 from vlcsync.vlc_finder import VlcFinder
 from vlcsync.vlc_conn import VlcConn
 
-from vlcsync.vlc_models import PlayState, State
+from vlcsync.vlc_models import PlayState, State, VlcId
 
 VLC_IFACE_IP = "127.0.0.42"
 
@@ -17,10 +17,9 @@ socket.setdefaulttimeout(0.5)
 
 
 class Vlc:
-    def __init__(self, pid, port):
-        self.pid = pid
-        self._port = port
-        self.vlc_conn = VlcConn(VLC_IFACE_IP, port, pid)
+    def __init__(self, vlc_id: VlcId):
+        self.vlc_id = vlc_id
+        self.vlc_conn = VlcConn(vlc_id)
         self.prev_state: State = self.cur_state()
 
     def play_state(self) -> PlayState:
@@ -85,7 +84,7 @@ class Vlc:
         return PlayState.UNKNOWN
 
     def __repr__(self):
-        return f"Vlc({self.pid=}, {self._port=}, {self.prev_state=})"
+        return f"Vlc({self.vlc_id}, {self.prev_state=})"
 
     def close(self):
         self.vlc_conn.close()
@@ -94,7 +93,7 @@ class Vlc:
 class VlcProcs:
     def __init__(self):
         self.closed = False
-        self._vlc_instances: dict[int, Vlc] = {}
+        self._vlc_instances: dict[VlcId, Vlc] = {}
         self.vlc_finder = VlcFinder()
         self.vlc_finder_thread = threading.Thread(target=self.refresh_vlc_list_periodically, daemon=True)
         self.vlc_finder_thread.start()
@@ -103,30 +102,30 @@ class VlcProcs:
         while not self.closed:
             start = time.time()
 
-            vlc_in_system = self.vlc_finder.find_vlc(VLC_IFACE_IP)
+            vlc_in_system = self.vlc_finder.find_local_vlc(VLC_IFACE_IP)
             logger.debug(vlc_in_system)
 
             # Remove missed
-            for missed_pid in (self._vlc_instances.keys() - vlc_in_system.keys()):
+            for missed_pid in (self._vlc_instances.keys() - vlc_in_system):
                 self.dereg(missed_pid)
 
             # Populate if not exists
-            for pid, port in vlc_in_system.items():
-                if pid not in self._vlc_instances.keys():
-                    vlc = Vlc(pid, port)
-                    print(f"Found instance with pid {pid} and port {VLC_IFACE_IP}:{port} {vlc.cur_state()}")
-                    self._vlc_instances[pid] = vlc
+            for vlc_id in vlc_in_system:
+                if vlc_id not in self._vlc_instances.keys():
+                    vlc = Vlc(vlc_id)
+                    print(f"Found instance {vlc_id}, with state {vlc.cur_state()}")
+                    self._vlc_instances[vlc_id] = vlc
 
             logger.debug(f"Compute all_vlc (took {time.time() - start:.3f})...")
             time.sleep(5)
 
     @property
-    def all_vlc(self) -> dict[int, Vlc]:
+    def all_vlc(self) -> dict[VlcId, Vlc]:
         return self._vlc_instances.copy()  # copy: for thread safe
 
     def sync_all(self, state: State, source: Vlc):
         logger.debug(">" * 60)
-        logger.debug(f"Detect change to {state} from {source.pid}")
+        logger.debug(f"Detect change to {state} from {source.vlc_id}")
         logger.debug(f" old --> {source.prev_state} ")
         logger.debug(f" new --> {state} ")
         logger.debug(f" Time diff abs(old - new) {abs(state.time_diff - source.prev_state.time_diff)}")
@@ -144,9 +143,9 @@ class VlcProcs:
                 next_vlc.sync_to(state, source)
         print()
 
-    def dereg(self, pid: int):
-        print(f"Detect vlc instance closed pid {pid}")
-        if vlc_to_close := self._vlc_instances.pop(pid, None):
+    def dereg(self, vlc_id: VlcId):
+        print(f"Detect vlc instance closed {vlc_id}")
+        if vlc_to_close := self._vlc_instances.pop(vlc_id, None):
             vlc_to_close.close()
 
     def close(self):

@@ -33,18 +33,18 @@ class Syncer:
     def do_sync(self):
         self.log_with_debounce("Sync...")
         try:
-            for pid, vlc in self.env.all_vlc.items():
+            for vlc_id, vlc in self.env.all_vlc.items():
                 is_changed, state = vlc.is_state_change()
                 if not state.is_active():
                     continue
 
                 if is_changed:
-                    print(f"\nVlc state change detected from {pid=}")
+                    print(f"\nVlc state change detected from ({vlc_id})")
                     self.env.sync_all(state, vlc)
                     return
 
         except VlcConnectionError as e:
-            self.env.dereg(e.pid)
+            self.env.dereg(e.vlc_id)
 
     def log_with_debounce(self, msg: str, _debounce=5):
         if time.time() > self.supress_log_until:
@@ -69,7 +69,7 @@ def main():
                     time.sleep(0.05)
         except KeyboardInterrupt:
             sys.exit(0)
-        except:
+        except Exception:
             print_exc()
             print("Exception detected. Restart sync...")
 

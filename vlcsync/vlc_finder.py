@@ -4,12 +4,13 @@ import functools
 import getpass
 import sys
 import traceback
-from typing import Dict
+from typing import Set
+from contextlib import contextmanager
 
 import psutil
 from psutil import Process
 
-from contextlib import contextmanager
+from vlcsync.vlc_models import VlcId
 
 
 @contextmanager
@@ -22,13 +23,13 @@ def skip_on_error():
 
 
 class VlcFinder:
-    def find_vlc(self, iface) -> Dict[int, int]:
-        vlc_ports = {}
+    def find_local_vlc(self, iface) -> Set[VlcId]:
+        vlc_ports = set()
 
         for proc in self._find_vlc_procs():
             port = self._has_listen_port(proc, iface)
             if port:
-                vlc_ports[proc.pid] = port
+                vlc_ports.add(VlcId(iface, port, proc.pid))
 
         return vlc_ports
 
