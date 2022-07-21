@@ -4,7 +4,6 @@ import socket
 import threading
 import time
 
-from cached_property import cached_property_with_ttl
 from loguru import logger
 
 from vlcsync.vlc_finder import VlcFinder
@@ -82,8 +81,8 @@ class Vlc:
         for pb_state in _valid_states:
             if pb_state in status:
                 return PlayState(pb_state)
-        else:
-            return PlayState.UNKNOWN
+
+        return PlayState.UNKNOWN
 
     def __repr__(self):
         return f"Vlc({self.pid=}, {self._port=}, {self.prev_state=})"
@@ -96,7 +95,7 @@ class VlcProcs:
     def __init__(self):
         self.closed = False
         self._vlc_instances: dict[int, Vlc] = {}
-        self.vlcFinder = VlcFinder()
+        self.vlc_finder = VlcFinder()
         self.vlc_finder_thread = threading.Thread(target=self.refresh_vlc_list_periodically, daemon=True)
         self.vlc_finder_thread.start()
 
@@ -104,7 +103,7 @@ class VlcProcs:
         while not self.closed:
             start = time.time()
 
-            vlc_in_system = self.vlcFinder.find_vlc(VLC_IFACE_IP)
+            vlc_in_system = self.vlc_finder.find_vlc(VLC_IFACE_IP)
             logger.debug(vlc_in_system)
 
             # Remove missed
@@ -123,7 +122,7 @@ class VlcProcs:
 
     @property
     def all_vlc(self) -> dict[int, Vlc]:
-        return self._vlc_instances.copy()  # For thread safe
+        return self._vlc_instances.copy()  # copy: for thread safe
 
     def sync_all(self, state: State, source: Vlc):
         logger.debug(">" * 60)
