@@ -25,7 +25,7 @@ Max 4 second diff calculated empirically
 class VlcId:
     addr: str
     port: int
-    pid: Optional[int] = field(compare=False, hash=False)
+    pid: Optional[int] = field(compare=False, hash=False, default=None)
 
     def __str__(self):
         return f"{self.addr}:{self.port}" + f" (pid={self.pid})" if self.pid else ""
