@@ -112,12 +112,20 @@ class VlcProcs:
             # Populate if not exists
             for vlc_id in vlc_in_system:
                 if vlc_id not in self._vlc_instances.keys():
-                    vlc = Vlc(vlc_id)
-                    print(f"Found instance {vlc_id}, with state {vlc.cur_state()}")
-                    self._vlc_instances[vlc_id] = vlc
+                    if vlc := self.try_connect(vlc_id):
+                        print(f"Found instance {vlc_id}, with state {vlc.cur_state()}")
+                        self._vlc_instances[vlc_id] = vlc
 
             logger.debug(f"Compute all_vlc (took {time.time() - start:.3f})...")
             time.sleep(5)
+
+    @staticmethod
+    def try_connect(vlc_id):
+        try:
+            return Vlc(vlc_id)
+        except Exception as e:
+            logger.opt(exception=True).debug("Cannot connect to {0}, cause: {1}", vlc_id, e)
+            return None
 
     @property
     def all_vlc(self) -> dict[VlcId, Vlc]:
