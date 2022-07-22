@@ -7,7 +7,7 @@ import time
 
 from loguru import logger
 
-from vlcsync.vlc_finder import print_exc
+from vlcsync.vlc_finder import print_exc, VlcFinder
 from vlcsync.vlc_util import VlcProcs
 from vlcsync.vlc_models import VlcConnectionError
 
@@ -21,7 +21,7 @@ else:
 class Syncer:
     def __init__(self):
         self.supress_log_until = 0
-        self.env = VlcProcs()
+        self.env = VlcProcs(VlcFinder(), extra_rc_hosts)
 
     def __enter__(self):
         self.do_sync()

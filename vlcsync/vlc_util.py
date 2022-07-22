@@ -6,9 +6,7 @@ import time
 
 from loguru import logger
 
-from vlcsync.vlc_finder import VlcFinder
 from vlcsync.vlc_conn import VlcConn
-
 from vlcsync.vlc_models import PlayState, State, VlcId
 
 VLC_IFACE_IP = "127.0.0.42"
@@ -91,10 +89,10 @@ class Vlc:
 
 
 class VlcProcs:
-    def __init__(self):
+    def __init__(self, vlc_finder):
         self.closed = False
         self._vlc_instances: dict[VlcId, Vlc] = {}
-        self.vlc_finder = VlcFinder()
+        self.vlc_finder = vlc_finder
         self.vlc_finder_thread = threading.Thread(target=self.refresh_vlc_list_periodically, daemon=True)
         self.vlc_finder_thread.start()
 
