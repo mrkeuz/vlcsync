@@ -3,6 +3,7 @@ from __future__ import annotations
 import socket
 import threading
 import time
+from typing import Set
 
 from loguru import logger
 
@@ -89,8 +90,9 @@ class Vlc:
 
 
 class VlcProcs:
-    def __init__(self, vlc_finder):
+    def __init__(self, vlc_finder, extra_rc_hosts: Set[VlcId] = frozenset()):
         self.closed = False
+        self._extra_rc_hosts = extra_rc_hosts
         self._vlc_instances: dict[VlcId, Vlc] = {}
         self.vlc_finder = vlc_finder
         self.vlc_finder_thread = threading.Thread(target=self.refresh_vlc_list_periodically, daemon=True)
@@ -100,15 +102,18 @@ class VlcProcs:
         while not self.closed:
             start = time.time()
 
-            vlc_in_system = self.vlc_finder.find_local_vlc(VLC_IFACE_IP)
-            logger.debug(vlc_in_system)
+            vlc_ids_list: Set[VlcId] = self.vlc_finder.find_local_vlc(VLC_IFACE_IP)
+            logger.debug(vlc_ids_list)
 
             # Remove missed
-            for missed_pid in (self._vlc_instances.keys() - vlc_in_system):
-                self.dereg(missed_pid)
+            for orphaned_vlc in (self._vlc_instances.keys() - vlc_ids_list):
+                self.dereg(orphaned_vlc)
+
+            # Add manually added vlc's
+            vlc_ids_list |= self._extra_rc_hosts
 
             # Populate if not exists
-            for vlc_id in vlc_in_system:
+            for vlc_id in vlc_ids_list:
                 if vlc_id not in self._vlc_instances.keys():
                     if vlc := self.try_connect(vlc_id):
                         print(f"Found instance {vlc_id}, with state {vlc.cur_state()}")
