@@ -6,7 +6,7 @@ Utility for synchronize multiple instances of VLC. Supports seek, play and pause
 
 #### Motivation
 
-Strongly inspired by F1 streams with extra driver tracking data streams. Did [not find](#alternatives) reasonable alternative for Linux. So decided to write my own solution.
+Strongly inspired by F1 streams with extra driver tracking data streams. Did [not find](#alternatives) reasonable alternative for Linux for playing several videos synchronously. So decided to write my own solution.
 
 ## Install
 
