@@ -10,7 +10,7 @@ from contextlib import contextmanager
 import psutil
 from psutil import Process
 
-from vlcsync.vlc_models import VlcId
+from vlcsync.vlc_state import VlcId
 
 
 @contextmanager
@@ -22,14 +22,22 @@ def skip_on_error():
         # whatever your common handling is
 
 
-class VlcFinder:
-    def find_local_vlc(self, iface) -> Set[VlcId]:
+class IVlcListFinder:
+    def get_vlc_list(self) -> Set[VlcId]:
+        raise NotImplementedError()
+
+
+class LocalProcessFinderProvider(IVlcListFinder):
+    def __init__(self, iface):
+        self.iface = iface
+
+    def get_vlc_list(self) -> Set[VlcId]:
         vlc_ports = set()
 
         for proc in self._find_vlc_procs():
-            port = self._has_listen_port(proc, iface)
+            port = self._has_listen_port(proc, self.iface)
             if port:
-                vlc_ports.add(VlcId(iface, port, proc.pid))
+                vlc_ports.add(VlcId(self.iface, port, proc.pid))
 
         return vlc_ports
 
@@ -87,3 +95,11 @@ def print_exc():
     traceback.print_exc(file=sys.stdout)
     print("-" * 60)
     print()
+
+
+class ExtraHostFinder(IVlcListFinder):
+    def __init__(self, extra_hosts: Set[VlcId]):
+        self.extra_host = extra_hosts
+
+    def get_vlc_list(self) -> Set[VlcId]:
+        return self.extra_host

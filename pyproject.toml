@@ -26,6 +26,7 @@ python = "^3.8"
 loguru = "*"
 psutil = "*"
 cached-property = "*"
+click = "^8.1.3"
 
 [tool.poetry.extras]
 

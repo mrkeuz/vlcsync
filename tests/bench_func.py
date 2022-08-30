@@ -2,11 +2,11 @@ import re
 import timeit
 from typing import Callable, Iterable
 
-from vlcsync.vlc_finder import VlcFinder
-from vlcsync.vlc_util import VLC_IFACE_IP
-from vlcsync.vlc_models import PlayState
+from vlcsync.vlc import VLC_IFACE_IP
+from vlcsync.vlc_finder import LocalProcessFinderProvider
+from vlcsync.vlc_state import PlayState
 
-finder = VlcFinder()
+finder = LocalProcessFinderProvider(VLC_IFACE_IP)
 
 
 # Ps_utils 0.069
@@ -70,8 +70,8 @@ def bench_in_enum():
         # print(pb_state)
         if (pb_state.value or "unk") in status:
             return pb_state
-    else:
-        return PlayState.UNKNOWN
+
+    return PlayState.UNKNOWN
 
 
 def bench_f(f: Callable, n=10) -> (int, str):

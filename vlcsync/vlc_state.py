@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from ipaddress import IPv4Address, IPv6Address
 from typing import Optional
 
 from loguru import logger
@@ -19,16 +18,6 @@ then it returns into normal synchronous.
 In vlc preference by default enabled option "skip frames"
 Max 4 second diff calculated empirically
 """
-
-
-@dataclass(frozen=True)
-class VlcId:
-    addr: str
-    port: int
-    pid: Optional[int] = field(compare=False, hash=False, default=None)
-
-    def __str__(self):
-        return f"{self.addr}:{self.port}" + f" (pid={self.pid})" if self.pid else ""
 
 
 class PlayState(Enum):
@@ -86,7 +75,11 @@ class State:
         return self.play_state in [PlayState.PLAYING, PlayState.PAUSED]
 
 
-class VlcConnectionError(TimeoutError):
-    def __init__(self, msg: str, vlc_id: VlcId):
-        super().__init__(msg)
-        self.vlc_id = vlc_id
+@dataclass(frozen=True)
+class VlcId:
+    addr: str
+    port: int
+    pid: Optional[int] = field(compare=False, hash=False, default=None)
+
+    def __str__(self):
+        return f"{self.addr}:{self.port}" + f" (pid={self.pid})" if self.pid else ""
