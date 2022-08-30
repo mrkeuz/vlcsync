@@ -33,6 +33,15 @@ $ vlc --rc-host 127.0.0.42 SomeMedia3.mkv &
 
 # vlcsync will monitor and syncing all players
 $ vlcsync
+
+# For control remote vlc instances, 
+# remote port should be open and rc interface listen on 0.0.0.0
+$ vlcsync --rc-host 192.168.1.100:12345 --rc-host 192.168.1.50:54321
+
+# For disable local discovery (only remote instances)
+$ vlcsync --no-local-discover --rc-host 192.168.1.100:12345
+
+<TBD> more detailed help 
 ```
 
 ## Demo
