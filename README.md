@@ -35,6 +35,10 @@ $ vlc --rc-host 127.0.0.42 SomeMedia3.mkv &
 $ vlcsync
 ```
 
+## Awesome 
+
+Awesome [use-case](./docs/awesome.md) ideas
+
 ## Demo
 
 ![vlcsync](./docs/vlcsync.gif)
