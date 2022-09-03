@@ -7,13 +7,15 @@ assignees: ''
 
 ---
 
+### Problematic
+
 ** 
-Please, read project Roadmap first. Maybe some features already planned. Feel free to comment.
-https://github.com/mrkeuz/vlcsync/blob/main/DEVELOPMENT.md#roadmap 
+Please, read project [Roadmap first](https://github.com/mrkeuz/vlcsync/blob/main/DEVELOPMENT.md#roadmap). Maybe some features already planned. Feel free move roadmap -> Issues if you have additional commants and ideas. 
 **
 
 **Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+
+### Solution
 
 **Describe the solution you'd like**
 A clear and concise description of what you want to happen.
