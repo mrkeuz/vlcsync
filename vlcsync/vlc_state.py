@@ -82,4 +82,4 @@ class VlcId:
     pid: Optional[int] = field(compare=False, hash=False, default=None)
 
     def __str__(self):
-        return f"{self.addr}:{self.port}" + f" (pid={self.pid})" if self.pid else ""
+        return f"{self.addr}:{self.port}" + (f" (pid={self.pid})" if self.pid else "")
