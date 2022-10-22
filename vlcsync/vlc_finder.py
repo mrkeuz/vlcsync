@@ -28,16 +28,16 @@ class IVlcListFinder:
 
 
 class LocalProcessFinderProvider(IVlcListFinder):
-    def __init__(self, iface):
-        self.iface = iface
+    def __init__(self, iface: str):
+        self._iface = iface
 
     def get_vlc_list(self) -> Set[VlcId]:
         vlc_ports = set()
 
         for proc in self._find_vlc_procs():
-            port = self._has_listen_port(proc, self.iface)
+            port = self._has_listen_port(proc, self._iface)
             if port:
-                vlc_ports.add(VlcId(self.iface, port, proc.pid))
+                vlc_ports.add(VlcId(self._iface, port, proc.pid))
 
         return vlc_ports
 
