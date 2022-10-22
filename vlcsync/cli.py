@@ -24,8 +24,9 @@ from vlcsync.vlc_state import VlcId
               "no_local_discover",
               required=False,
               is_flag=True,
-              help="Disable discover local vlc instances")
+              help="Disable discovery local vlc instances")
 def main(rc_host_list: Set[VlcId], no_local_discover):
+    """Utility for synchronize multiple instances of VLC. Supports seek, play and pause."""
     print("Vlcsync started...")
 
     app_config = AppConfig(rc_host_list, no_local_discover)
