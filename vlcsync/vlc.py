@@ -119,7 +119,7 @@ class VlcProcs:
             for vlc_id in vlc_candidates:
                 if vlc_id not in self._vlc_instances.keys():
                     if vlc := self.try_connect(vlc_id):
-                        print(f"Found instance {vlc_id}, with state {vlc.cur_state()}")
+                        print(f"Found active instance {vlc_id}, with state {vlc.cur_state()}")
                         self._vlc_instances[vlc_id] = vlc
 
             logger.debug(f"Compute all_vlc (took {time.time() - start:.3f})...")
@@ -131,6 +131,7 @@ class VlcProcs:
             return Vlc(vlc_id)
         except Exception as e:
             logger.opt(exception=True).debug("Cannot connect to {0}, cause: {1}", vlc_id, e)
+            print(f"Cannot connect to {vlc_id} socket, cause: {e}. Skipping. Enable debug for more info. See --help. ")
             return None
 
     @property
