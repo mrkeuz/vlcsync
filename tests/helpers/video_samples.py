@@ -4,7 +4,7 @@ import subprocess as sp
 import os
 
 
-def generate(prefix: str):
+def generate_vid_sample(prefix: str) -> Path:
     f_name: Path = Path(f"~/.cache/vlssync/tests/{prefix}.mp4").expanduser()
 
     if not f_name.exists():
@@ -26,6 +26,10 @@ def generate(prefix: str):
             of.write('\0' * (50 * 1024 * 1024 - stat.st_size))
             of.flush()
 
+    return f_name
+
 
 if __name__ == '__main__':
-    generate("some")
+    samples = [generate_vid_sample("test1"),
+               generate_vid_sample("test2"),
+               generate_vid_sample("test3")]
