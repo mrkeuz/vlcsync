@@ -35,6 +35,9 @@ class Syncer:
 
         if app_config.extra_rc_hosts:
             vlc_finders.add(ExtraHostFinder(app_config.extra_rc_hosts))
+            for rc_host in app_config.extra_rc_hosts:
+                rc_host: VlcId
+                print(f"  Manual host defined {rc_host.addr}:{rc_host.port}")
         else:
             print("""  Manual vlc addresses ("--rc-host" args) NOT provided...""")
 
