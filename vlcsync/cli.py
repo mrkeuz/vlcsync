@@ -20,7 +20,7 @@ from vlcsync.vlc_state import VlcId
               callback=parse_url,
               multiple=True,
               metavar='<host:port>')
-@click.option("--no-local-discover",
+@click.option("--no-local-discovery",
               "no_local_discover",
               required=False,
               is_flag=True,
