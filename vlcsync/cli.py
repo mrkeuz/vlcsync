@@ -11,8 +11,11 @@ from vlcsync.syncer import AppConfig, Syncer
 from vlcsync.vlc_finder import print_exc
 from vlcsync.vlc_state import VlcId
 
+__version__ = "0.2.0b0"
+
 
 @click.command
+@click.version_option(__version__)
 @click.option("--rc-host",
               'rc_host_list',
               help='Additional players (can be multiple)',
