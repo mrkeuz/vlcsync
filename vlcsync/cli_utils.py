@@ -27,5 +27,6 @@ def parse_vlc_id(addr: str) -> VlcId:
         logger.debug("Parse error.", e)
         raise click.BadParameter(f'{addr} is invalid (cause {e})') from e
     except Exception as e:
-        logger.debug("Unexpected Parse error")
+        error_msg = f'Unexpected error during parse {addr} (cause {e})'
+        logger.error(error_msg)
         raise click.BadParameter(f'Unexpected error during parse {addr} (cause {e})') from e
