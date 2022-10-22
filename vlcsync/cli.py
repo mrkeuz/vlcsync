@@ -18,7 +18,7 @@ __version__ = "0.2.0b0"
 @click.version_option(__version__)
 @click.option("--rc-host",
               'rc_host_list',
-              help='Additional players (can be multiple)',
+              help='Additional players (can be multiple).',
               required=False,
               callback=parse_url,
               multiple=True,
@@ -27,7 +27,7 @@ __version__ = "0.2.0b0"
               "no_local_discover",
               required=False,
               is_flag=True,
-              help="Disable discovery local vlc instances")
+              help="Disable discovery local vlc instances.")
 def main(rc_host_list: Set[VlcId], no_local_discover):
     """Utility for synchronize multiple instances of VLC. Supports seek, play and pause."""
     print("Vlcsync started...")
