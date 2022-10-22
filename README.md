@@ -41,7 +41,8 @@ $ vlcsync --rc-host 192.168.1.100:12345 --rc-host 192.168.1.50:54321
 # For disable local discovery (only remote instances)
 $ vlcsync --no-local-discover --rc-host 192.168.1.100:12345
 
-<TBD> more detailed help 
+# For help and see all options
+$ vlcsync --help
 ```
 
 ## Demo
