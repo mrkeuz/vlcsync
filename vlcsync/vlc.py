@@ -7,8 +7,9 @@ from typing import Set
 
 from loguru import logger
 
-from vlcsync.vlc_conn import VlcConn
-from vlcsync.vlc_models import PlayState, State, VlcId
+from vlcsync.vlc_finder import IVlcListFinder
+from vlcsync.vlc_socket import VlcSocket
+from vlcsync.vlc_state import PlayState, State, VlcId
 
 VLC_IFACE_IP = "127.0.0.42"
 
@@ -18,7 +19,7 @@ socket.setdefaulttimeout(0.5)
 class Vlc:
     def __init__(self, vlc_id: VlcId):
         self.vlc_id = vlc_id
-        self.vlc_conn = VlcConn(vlc_id)
+        self.vlc_conn = VlcSocket(vlc_id)
         self.prev_state: State = self.cur_state()
 
     def play_state(self) -> PlayState:
@@ -90,11 +91,10 @@ class Vlc:
 
 
 class VlcProcs:
-    def __init__(self, vlc_finder, extra_rc_hosts: Set[VlcId] = frozenset()):
+    def __init__(self, vlc_list_providers: Set[IVlcListFinder]):
         self.closed = False
-        self._extra_rc_hosts = extra_rc_hosts
         self._vlc_instances: dict[VlcId, Vlc] = {}
-        self.vlc_finder = vlc_finder
+        self.vlc_list_providers = vlc_list_providers
         self.vlc_finder_thread = threading.Thread(target=self.refresh_vlc_list_periodically, daemon=True)
         self.vlc_finder_thread.start()
 
@@ -102,21 +102,24 @@ class VlcProcs:
         while not self.closed:
             start = time.time()
 
-            vlc_ids_list: Set[VlcId] = self.vlc_finder.find_local_vlc(VLC_IFACE_IP)
-            logger.debug(vlc_ids_list)
+            vlc_candidates = []
+
+            for vlc_list_provider in self.vlc_list_providers:
+                vlc_list_provider: IVlcListFinder
+                next_vlc_ids_list: Set[VlcId] = vlc_list_provider.get_vlc_list()
+
+                vlc_candidates.extend(next_vlc_ids_list)
+                logger.debug(next_vlc_ids_list)
 
             # Remove missed
-            for orphaned_vlc in (self._vlc_instances.keys() - vlc_ids_list):
+            for orphaned_vlc in (self._vlc_instances.keys() - vlc_candidates):
                 self.dereg(orphaned_vlc)
 
-            # Add manually added vlc's
-            vlc_ids_list |= self._extra_rc_hosts
-
             # Populate if not exists
-            for vlc_id in vlc_ids_list:
+            for vlc_id in vlc_candidates:
                 if vlc_id not in self._vlc_instances.keys():
                     if vlc := self.try_connect(vlc_id):
-                        print(f"Found instance {vlc_id}, with state {vlc.cur_state()}")
+                        print(f"Found active instance {vlc_id}, with state {vlc.cur_state()}")
                         self._vlc_instances[vlc_id] = vlc
 
             logger.debug(f"Compute all_vlc (took {time.time() - start:.3f})...")
@@ -128,6 +131,7 @@ class VlcProcs:
             return Vlc(vlc_id)
         except Exception as e:
             logger.opt(exception=True).debug("Cannot connect to {0}, cause: {1}", vlc_id, e)
+            print(f"Cannot connect to {vlc_id} socket, cause: {e}. Skipping. Enable debug for more info. See --help. ")
             return None
 
     @property
@@ -168,3 +172,5 @@ class VlcProcs:
 
     def __del__(self):
         self.close()
+
+

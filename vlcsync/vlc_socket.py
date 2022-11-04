@@ -5,12 +5,12 @@ import time
 
 from loguru import logger
 
-from vlcsync.vlc_models import VlcConnectionError, VlcId
+from vlcsync.vlc_state import VlcId
 
 VLC_PROMPT = b"> "
 
 
-class VlcConn:
+class VlcSocket:
     def __init__(self, vlc_id: VlcId):
         self.vlc_id = vlc_id
         logger.trace("Connect {0}", vlc_id)
@@ -51,3 +51,9 @@ class VlcConn:
             self.sock.close()
         except Exception:
             pass
+
+
+class VlcConnectionError(TimeoutError):
+    def __init__(self, msg: str, vlc_id: VlcId):
+        super().__init__(msg)
+        self.vlc_id = vlc_id

@@ -1,12 +1,12 @@
 from unittest import TestCase
 
-from vlcsync.vlc_util import VLC_IFACE_IP
-from vlcsync.vlc_finder import VlcFinder
+from vlcsync.vlc import VLC_IFACE_IP
+from vlcsync.vlc_finder import LocalProcessFinderProvider
 
 
 class TestVlcFinder(TestCase):
     def test_find_vlc_psutil(self):
-        finder = VlcFinder()
+        finder = LocalProcessFinderProvider()
         vlc_ports = {}
         for p in finder._find_vlc_procs():
             port1 = finder._has_listen_port(p, VLC_IFACE_IP)
