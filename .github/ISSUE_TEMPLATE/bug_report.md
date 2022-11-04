@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
  - OS: [e.g. Windows 7 (32-bit), macOS ..., Linux]
- - Version: [e.g. 22]
+ - Vlcsync version: [e.g. 0.2.0] (`vlcsync --version`)
  - Python version 
  - Installed by: Binary, pip, sources
 
