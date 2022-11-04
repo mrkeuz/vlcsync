@@ -11,7 +11,7 @@ from vlcsync.syncer import AppConfig, Syncer
 from vlcsync.vlc_finder import print_exc
 from vlcsync.vlc_state import VlcId
 
-__version__ = "0.2.0b0"
+__version__ = "0.2.0"
 
 
 @click.command
