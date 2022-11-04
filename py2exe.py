@@ -15,4 +15,4 @@ def get_version() -> str:
 
 if __name__ == '__main__':
     print(get_version())
-    os.system(f"pyinstaller --specpath ./dist --onefile -n vlcsync_{get_version()} ./vlcsync/main.py")
+    os.system(f"pyinstaller --hidden-import click --specpath ./dist --onefile -n vlcsync_{get_version()} ./vlcsync/main.py")
