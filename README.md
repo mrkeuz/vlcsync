@@ -69,7 +69,7 @@ Awesome [use-case](./docs/awesome.md) ideas
 ## Alternatives
 
 - [vlc](https://www.videolan.org/vlc/index.ru.html) 
-    - There is a [netsync](https://wiki.videolan.org/Documentation:Modules/netsync/) but seem only master-slave (tried, but not working by some reeason)
+    - There is a [netsync](https://wiki.videolan.org/Documentation:Modules/netsync/) but seem only master-slave (tried, but not working by some reason)
     - Open additional media. Seems feature broken in vlc 3 (also afaik limited only 2 streams)  
 - [Syncplay](https://github.com/Syncplay/syncplay) - very promised, but little [complicated](https://github.com/Syncplay/syncplay/discussions/463) for sync different videos
 - [bino](https://bino3d.org/) - working, very strange controls, file dialog not working and only fullscreen
