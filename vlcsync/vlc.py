@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+from functools import lru_cache
+import re
 import socket
 import threading
 import time
-from typing import Set
+from typing import Set, List, Optional
 
 from loguru import logger
 
 from vlcsync.vlc_finder import IVlcListFinder
 from vlcsync.vlc_socket import VlcSocket
-from vlcsync.vlc_state import PlayState, State, VlcId
+from vlcsync.vlc_state import PlayState, State, VlcId, PlayList, PlayListItem
 
 VLC_IFACE_IP = "127.0.0.42"
 
@@ -31,15 +33,27 @@ class Vlc:
         if seek != '':
             return int(seek)
 
+    def playlist_goto(self, vlc_internal_index: int):
+        self.vlc_conn.cmd(f"goto {vlc_internal_index}")
+
+    def playlist(self) -> PlayList:
+        cmd_resp = self.vlc_conn.cmd("playlist")
+        return self._extract_playlist(cmd_resp)
+
     def seek(self, seek: int):
         self.vlc_conn.cmd(f"seek {seek}")
+
+    def stop(self):
+        self.vlc_conn.cmd("stop")
 
     def cur_state(self) -> State:
         get_time = self.get_time()
 
         return State(self.play_state(),
                      get_time,
-                     time.time() - (get_time or 0))
+                     self.playlist().active_order_index(),
+                     time.time() - (get_time or 0)
+                     )
 
     def is_state_change(self) -> (bool, State):
         cur_state: State = self.cur_state()
@@ -50,20 +64,38 @@ class Vlc:
         return is_change, cur_state
 
     def sync_to(self, new_state: State, source: Vlc):
-        if not new_state.is_active():
-            return
+        if new_state.play_state == PlayState.STOPPED:
+            self.stop()
 
-        cur_play_state = self.play_state()
+        if new_state.is_play_or_pause():
+            self.sync_playlist(new_state)
 
-        if cur_play_state != new_state.play_state:
-            self.play_if_pause(new_state, cur_play_state)
-            self.pause_if_play(new_state, cur_play_state)
+        if new_state.is_play_or_pause():
+            cur_play_state = self.play_state()
 
-        # Sync all secondary, but main only when playing
-        if source != self or cur_play_state == PlayState.PLAYING:
-            self.seek(new_state.seek)
+            if cur_play_state != new_state.play_state:
+                self.play_if_pause(new_state, cur_play_state)
+                self.pause_if_play(new_state, cur_play_state)
+
+            if cur_play_state == PlayState.PAUSED and source == self:
+                """
+                Skip sync seek with himself on pause (avoid flickering)
+                As half-seconds not supported and cannot to set.
+                """
+                pass
+            else:
+                # In all other cases
+                self.seek(new_state.seek)
 
         self.prev_state = self.cur_state()
+
+    def sync_playlist(self, new_state):
+        cur_playlist = self.playlist()
+        if cur_playlist.active_order_index() != new_state.playlist_order_idx:
+            if new_state.playlist_order_idx is not None and len(cur_playlist.items) > new_state.playlist_order_idx:
+                self.playlist_goto(cur_playlist.items[new_state.playlist_order_idx].vlc_internal_index)
+            else:
+                self.stop()
 
     def pause_if_play(self, new_state, cur_play_state):
         if cur_play_state == PlayState.PLAYING and new_state.play_state == PlayState.PAUSED:
@@ -82,6 +114,33 @@ class Vlc:
                 return PlayState(pb_state)
 
         return PlayState.UNKNOWN
+
+    @staticmethod
+    @lru_cache(maxsize=32)
+    def _extract_playlist(resp: str) -> PlayList:
+        """ Playlist Format
+        +----[ Playlist - playlist ]
+        | 1 - Плейлист
+        |   6 - Video 1.mkv (00:23:37) [played 1 time]
+        |  *4 - Video 2.mkv (00:23:44) [played 2 times]
+        |   3 - Video 3.mkv (00:23:43) [played 1 time]
+        |   5 - Video 4.mkv (00:23:44) [played 1 time]
+        | 2 - Медиатека
+        |   12 - Video 6.mkv (00:23:44)
+        +----[ End of playlist ]
+        """
+
+        items: List[PlayListItem] = []
+        active: Optional[PlayListItem] = None
+
+        item_re = r'\| {2}([ \*])(\d+) -.'
+        for idx, match in enumerate(re.finditer(item_re, resp)):
+            item = PlayListItem(idx, match.group(2))
+            items.append(item)
+            if match.group(1) == "*":
+                active = item
+
+        return PlayList(items, active)
 
     def __repr__(self):
         return f"Vlc({self.vlc_id}, {self.prev_state=})"
@@ -143,19 +202,15 @@ class VlcProcs:
         logger.debug(f"Detect change to {state} from {source.vlc_id}")
         logger.debug(f" old --> {source.prev_state} ")
         logger.debug(f" new --> {state} ")
-        logger.debug(f" Time diff abs(old - new) {abs(state.time_diff - source.prev_state.time_diff)}")
+        logger.debug(f" Time diff abs(old - new) {abs(state.start_at_abs_time - source.prev_state.start_at_abs_time)}")
         logger.debug("<" * 60)
         logger.debug("")
-        print(">>> Sync windows...")
-        if not state.is_active():
-            print("   Source window stopped. Skip sync")
-            return
+        print(">>> Sync players...")
 
         for next_pid, next_vlc in self.all_vlc.items():
             next_vlc: Vlc
-            if next_vlc.cur_state().is_active():
-                print(f"    Sync {next_pid} to {state}")
-                next_vlc.sync_to(state, source)
+            print(f"    Sync {next_pid} to {state}")
+            next_vlc.sync_to(state, source)
         print()
 
     def dereg(self, vlc_id: VlcId):
@@ -172,5 +227,3 @@ class VlcProcs:
 
     def __del__(self):
         self.close()
-
-

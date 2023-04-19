@@ -60,8 +60,6 @@ class Syncer:
         try:
             for vlc_id, vlc in self.env.all_vlc.items():
                 is_changed, state = vlc.is_state_change()
-                if not state.is_active():
-                    continue
 
                 if is_changed:
                     print(f"\nVlc state change detected from ({vlc_id})")
