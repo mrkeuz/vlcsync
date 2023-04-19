@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
+from typing import Optional, List
 
 from loguru import logger
 
@@ -38,10 +38,13 @@ class PlayState(Enum):
 class State:
     play_state: PlayState
     seek: int
-    time_diff: float = field(repr=False)
+    playlist_order_idx: int
+    # Real clock time of video start
+    start_at_abs_time: float = field(repr=False)
 
     def same(self, other: State):
         return (self.same_play_state(other) and
+                self.same_playlist_item(other) and
                 (
                         self.play_in_same_pos(other) or
                         self.pause_is_same_pos(other) or
@@ -57,22 +60,40 @@ class State:
 
     def play_in_same_pos(self: State, other: State):
         """ Check time_diff only when play """
-        desync_secs = abs(self.time_diff - other.time_diff)
+        desync_secs = abs(self.start_at_abs_time - other.start_at_abs_time)
 
         if 2 < desync_secs < MAX_DESYNC_SECONDS:
             logger.debug(f"Asynchronous anomaly between probes: {desync_secs} secs")
 
         return (
                 self.play_state == other.play_state == PlayState.PLAYING and
-                self.time_diff and other.time_diff and
+                # self.start_at and other.start_at and
                 desync_secs < MAX_DESYNC_SECONDS
         )
 
     def both_stopped(self, other: State):
         return self.play_state == other.play_state == PlayState.STOPPED
 
-    def is_active(self):
+    def is_play_or_pause(self):
         return self.play_state in [PlayState.PLAYING, PlayState.PAUSED]
+
+    def same_playlist_item(self, other):
+        return self.playlist_order_idx == other.playlist_order_idx
+
+
+@dataclass
+class PlayListItem:
+    order_index: int
+    vlc_internal_index: int
+
+
+@dataclass
+class PlayList:
+    items: List[PlayListItem]
+    active_item: Optional[PlayListItem]
+
+    def active_order_index(self) -> Optional[int]:
+        return self.active_item.order_index if self.active_item else None
 
 
 @dataclass(frozen=True)
