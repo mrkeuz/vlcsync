@@ -13,10 +13,9 @@ from vlcsync.vlc_finder import IVlcListFinder
 from vlcsync.vlc_socket import VlcSocket
 from vlcsync.vlc_state import PlayState, State, VlcId, PlayList, PlayListItem
 
-
 VLC_IFACE_IP = "127.0.0.42"
-RE_STATE_COMPILED = re.compile(r"\( state (playing|stopped|paused) \)")
-RE_PLAYLIST_ITEM =  re.compile(r'\| {2}([ \*])(\d+) - ')
+RE_PLAYSTATE_COMPILED = re.compile(r"\( state (playing|stopped|paused) \)")
+RE_PLAYLIST_ITEM = re.compile(r'\| {2}([ \*])(\d+) - ')
 
 socket.setdefaulttimeout(0.5)
 
@@ -130,7 +129,7 @@ class Vlc:
     @staticmethod
     @lru_cache(maxsize=128)
     def _extract_state(status: str):
-        match = RE_STATE_COMPILED.search(status)
+        match = RE_PLAYSTATE_COMPILED.search(status)
         return PlayState(match.group(1)) if match else PlayState.UNKNOWN
 
     @staticmethod
