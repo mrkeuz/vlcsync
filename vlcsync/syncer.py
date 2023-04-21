@@ -18,6 +18,7 @@ from vlcsync.vlc_state import VlcId
 class AppConfig:
     extra_rc_hosts: Set[VlcId]
     no_local_discovery: bool
+    volume_sync: bool
 
 
 class Syncer:
@@ -58,16 +59,32 @@ class Syncer:
     def do_sync(self):
         self.log_with_debounce("Sync...")
         try:
-            for vlc_id, vlc in self.env.all_vlc.items():
-                is_changed, state = vlc.is_state_change()
+            if self.app_config.volume_sync:
+                self.sync_volume()
 
-                if is_changed:
-                    print(f"\nVlc state change detected from ({vlc_id})")
-                    self.env.sync_all(state, vlc)
-                    return
+            self.sync_playstate()
 
         except VlcConnectionError as e:
             self.env.dereg(e.vlc_id)
+
+    def sync_playstate(self):
+        for vlc_id, vlc in self.env.all_vlc.items():
+            is_changed, state = vlc.is_state_change()
+
+            if is_changed:
+                print(f"\nVlc state change detected from ({vlc_id})")
+                self.env.sync_all(state, vlc)
+                break
+
+    def sync_volume(self):
+        for vlc_id, vlc in self.env.all_vlc.items():
+            cur_volume = vlc.volume()
+            if vlc.prev_volume != cur_volume:
+                for vlc_id_for_sync, vlc_for_sync in self.env.all_vlc.items():
+                    vlc_for_sync.prev_volume = cur_volume
+                    if vlc_for_sync != vlc:
+                        vlc_for_sync.set_volume(cur_volume)
+                break
 
     def log_with_debounce(self, msg: str, _debounce=5):
         if time.time() > self.supress_log_until:

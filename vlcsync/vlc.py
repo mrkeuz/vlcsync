@@ -23,6 +23,7 @@ class Vlc:
         self.vlc_id = vlc_id
         self.vlc_conn = VlcSocket(vlc_id)
         self.prev_state: State = self.cur_state()
+        self.prev_volume = self.volume()
 
     def play_state(self) -> PlayState:
         status = self.vlc_conn.cmd("status")
@@ -39,6 +40,17 @@ class Vlc:
     def playlist(self) -> PlayList:
         cmd_resp = self.vlc_conn.cmd("playlist")
         return self._extract_playlist(cmd_resp)
+
+    def volume(self) -> Optional[int]:
+        vol = self.vlc_conn.cmd("volume")
+        if vol.strip() != '':
+            return int(vol)
+        else:
+            return None
+
+    def set_volume(self, volume: int):
+        self.vlc_conn.cmd(f"volume {volume}")
+        self.prev_volume = volume
 
     def seek(self, seek: int):
         self.vlc_conn.cmd(f"seek {seek}")
