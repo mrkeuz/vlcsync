@@ -58,6 +58,12 @@ class Vlc:
     def stop(self):
         self.vlc_conn.cmd("stop")
 
+    def pause(self):
+        self.vlc_conn.cmd("pause")
+
+    def play(self):
+        self.vlc_conn.cmd("play")
+
     def cur_state(self) -> State:
         get_time = self.get_time()
 
@@ -76,46 +82,45 @@ class Vlc:
         return is_change, cur_state
 
     def sync_to(self, new_state: State, source: Vlc):
-        if new_state.play_state == PlayState.STOPPED:
-            self.stop()
+        cur_play_state = self.play_state()
 
-        if new_state.is_play_or_pause():
-            self.sync_playlist(new_state)
-
-        if new_state.is_play_or_pause():
-            cur_play_state = self.play_state()
-
-            if cur_play_state != new_state.play_state:
-                self.play_if_pause(new_state, cur_play_state)
-                self.pause_if_play(new_state, cur_play_state)
-
-            if cur_play_state == PlayState.PAUSED and source == self:
-                """
-                Skip sync seek with himself on pause (avoid flickering)
-                As half-seconds not supported and cannot to set.
-                """
-                pass
-            else:
-                # In all other cases
-                self.seek(new_state.seek)
+        self._sync_playlist(new_state)
+        self._sync_playstate(cur_play_state, new_state)
+        self._sync_timeline(cur_play_state, new_state, source)
 
         self.prev_state = self.cur_state()
 
-    def sync_playlist(self, new_state):
+    def _sync_timeline(self, cur_play_state, new_state, source):
+        if cur_play_state == PlayState.PAUSED and source == self:
+            """
+            Skip sync seek with himself on pause (avoid flickering)
+            As half-seconds not supported and cannot to set.
+            """
+            pass
+        else:
+            # In all other cases
+            self.seek(new_state.seek)
+
+    def _sync_playstate(self, cur_play_state, new_state):
+        if cur_play_state != new_state.play_state:
+            if new_state.play_state == PlayState.STOPPED:
+                self.stop()
+            elif new_state.play_state == PlayState.PLAYING:
+                if cur_play_state in [PlayState.PAUSED, PlayState.STOPPED]:
+                    self.play()
+            elif new_state.play_state == PlayState.PAUSED:
+                if cur_play_state == PlayState.PLAYING:
+                    self.pause()
+            else:
+                logger.warning(f"Unknown new play state {new_state.play_state} for player")
+
+    def _sync_playlist(self, new_state):
         cur_playlist = self.playlist()
-        if cur_playlist.active_order_index() != new_state.playlist_order_idx:
+        if new_state.is_play_or_pause() and cur_playlist.active_order_index() != new_state.playlist_order_idx:
             if new_state.playlist_order_idx is not None and len(cur_playlist.items) > new_state.playlist_order_idx:
                 self.playlist_goto(cur_playlist.items[new_state.playlist_order_idx].vlc_internal_index)
             else:
                 self.stop()
-
-    def pause_if_play(self, new_state, cur_play_state):
-        if cur_play_state == PlayState.PLAYING and new_state.play_state == PlayState.PAUSED:
-            self.vlc_conn.cmd("pause")
-
-    def play_if_pause(self, new_state, cur_play_state):
-        if cur_play_state == PlayState.PAUSED and new_state.play_state == PlayState.PLAYING:
-            self.vlc_conn.cmd("play")
 
     @staticmethod
     def _extract_state(status, _valid_states=(PlayState.PLAYING.value,
