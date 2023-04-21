@@ -13,7 +13,10 @@ from vlcsync.vlc_finder import IVlcListFinder
 from vlcsync.vlc_socket import VlcSocket
 from vlcsync.vlc_state import PlayState, State, VlcId, PlayList, PlayListItem
 
+
 VLC_IFACE_IP = "127.0.0.42"
+RE_STATE_COMPILED = re.compile(r"\( state (playing|stopped|paused) \)")
+RE_PLAYLIST_ITEM =  re.compile(r'\| {2}([ \*])(\d+) - ')
 
 socket.setdefaulttimeout(0.5)
 
@@ -82,15 +85,16 @@ class Vlc:
         return is_change, cur_state
 
     def sync_to(self, new_state: State, source: Vlc):
-        cur_play_state = self.play_state()
 
         self._sync_playlist(new_state)
-        self._sync_playstate(cur_play_state, new_state)
-        self._sync_timeline(cur_play_state, new_state, source)
+        self._sync_playstate(new_state)
+        self._sync_timeline(new_state, source)
 
         self.prev_state = self.cur_state()
 
-    def _sync_timeline(self, cur_play_state, new_state, source):
+    def _sync_timeline(self, new_state: State, source: Vlc):
+        cur_play_state = self.play_state()
+
         if cur_play_state == PlayState.PAUSED and source == self:
             """
             Skip sync seek with himself on pause (avoid flickering)
@@ -101,7 +105,8 @@ class Vlc:
             # In all other cases
             self.seek(new_state.seek)
 
-    def _sync_playstate(self, cur_play_state, new_state):
+    def _sync_playstate(self, new_state: State):
+        cur_play_state: PlayState = self.play_state()
         if cur_play_state != new_state.play_state:
             if new_state.play_state == PlayState.STOPPED:
                 self.stop()
@@ -114,7 +119,7 @@ class Vlc:
             else:
                 logger.warning(f"Unknown new play state {new_state.play_state} for player")
 
-    def _sync_playlist(self, new_state):
+    def _sync_playlist(self, new_state: State):
         cur_playlist = self.playlist()
         if new_state.is_play_or_pause() and cur_playlist.active_order_index() != new_state.playlist_order_idx:
             if new_state.playlist_order_idx is not None and len(cur_playlist.items) > new_state.playlist_order_idx:
@@ -123,19 +128,15 @@ class Vlc:
                 self.stop()
 
     @staticmethod
-    def _extract_state(status, _valid_states=(PlayState.PLAYING.value,
-                                              PlayState.PAUSED.value,
-                                              PlayState.STOPPED.value)):
-        for pb_state in _valid_states:
-            if pb_state in status:
-                return PlayState(pb_state)
-
-        return PlayState.UNKNOWN
+    @lru_cache(maxsize=128)
+    def _extract_state(status: str):
+        match = RE_STATE_COMPILED.search(status)
+        return PlayState(match.group(1)) if match else PlayState.UNKNOWN
 
     @staticmethod
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=128)
     def _extract_playlist(resp: str) -> PlayList:
-        """ Playlist Format
+        """ Playlist answer Format:
         +----[ Playlist - playlist ]
         | 1 - Плейлист
         |   6 - Video 1.mkv (00:23:37) [played 1 time]
@@ -150,8 +151,7 @@ class Vlc:
         items: List[PlayListItem] = []
         active: Optional[PlayListItem] = None
 
-        item_re = r'\| {2}([ \*])(\d+) -.'
-        for idx, match in enumerate(re.finditer(item_re, resp)):
+        for idx, match in enumerate(re.finditer(RE_PLAYLIST_ITEM, resp)):
             item = PlayListItem(idx, match.group(2))
             items.append(item)
             if match.group(1) == "*":
