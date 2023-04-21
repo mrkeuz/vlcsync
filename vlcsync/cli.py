@@ -28,11 +28,23 @@ __version__ = "0.3.0"
               required=False,
               is_flag=True,
               help="Disable discovery local vlc instances.")
-def main(rc_host_list: Set[VlcId], no_local_discover):
+@click.option("--volume-sync",
+              "volume_sync",
+              default=False,
+              required=False,
+              is_flag=True,
+              help=
+              """
+              Enable volume sync between players. Useful for play video with external audio file.\n
+              I.e. first play video with disabled audio track ('vlc --no-audio video.mkv' option) and then play audio stream (`vlc audio.mka`).
+              \n  
+              And you can control volume from main video player.
+              """)
+def main(rc_host_list: Set[VlcId], no_local_discover, volume_sync):
     """Utility for synchronize multiple instances of VLC. Supports seek, play and pause."""
     print("Vlcsync started...")
 
-    app_config = AppConfig(rc_host_list, no_local_discover)
+    app_config = AppConfig(rc_host_list, no_local_discover, volume_sync)
     time.sleep(2)  # Wait instances
     while True:
         try:
