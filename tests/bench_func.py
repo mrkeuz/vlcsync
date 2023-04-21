@@ -1,8 +1,8 @@
-import re
+import random
 import timeit
 from typing import Callable, Iterable
 
-from vlcsync.vlc import VLC_IFACE_IP
+from vlcsync.vlc import VLC_IFACE_IP, Vlc
 from vlcsync.vlc_finder import LocalProcessFinderProvider
 from vlcsync.vlc_state import PlayState
 
@@ -16,10 +16,9 @@ def bench_finder_utils():
         port = finder._has_listen_port(p, VLC_IFACE_IP)
         if port:
             vlc_ports[p.pid] = port
-    vlc_ports
 
 
-status = "ioqewufpodia state pause"
+status = "ioqewufpodia( state paused )"
 
 
 def bench_index():
@@ -36,23 +35,31 @@ def bench_index():
         return PlayState.UNKNOWN
 
 
-e_list = [PlayState.PLAYING.value, PlayState.STOPPED.value, PlayState.PAUSED.value]
-re_state = "state ({0})".format("|".join(e_list))
-re_state_compiled = re.compile(re_state)
+def bench_extract_state_re():
+    s = status
+    Vlc._extract_state(s + str(random.randint(0, 100500)))
 
-
-def bench_re():
-    match = re_state_compiled.search(status)
-
-    return PlayState(match.group(1)) if match else PlayState.UNKNOWN
+r = random.Random()
+def bench_extract_playlist_re():
+    s = """
+    | 1 - Плейлист
+    |   6 - Video 1.mkv (00:23:37) [played 1 time]
+    |  *4 - Video 2.mkv (00:23:44) [played 2 times]
+    |   3 - Video 3.mkv (00:23:43) [played 1 time]
+    |   5 - Video 4.mkv (00:23:44) [played 1 time]
+    | 2 - Медиатека
+    |   12 - Video 6.mkv (00:23:44)
+    +----[ End of playlist ]
+    """
+    Vlc._extract_playlist(s + str(random.randint(0, 100500)))
 
 
 def bench_in():
-    for pb_state in e_list:
+    for pb_state in ['played', 'paused', 'stopped']:
         if pb_state in status:
             return PlayState(pb_state)
-    else:
-        return PlayState.UNKNOWN
+
+    return PlayState.UNKNOWN
 
 
 def bench_in_cached(_valid_states=(PlayState.PLAYING.value,
@@ -61,8 +68,8 @@ def bench_in_cached(_valid_states=(PlayState.PLAYING.value,
     for pb_state in _valid_states:
         if pb_state in status:
             return PlayState(pb_state)
-    else:
-        return PlayState.UNKNOWN
+
+    return PlayState.UNKNOWN
 
 
 def bench_in_enum():
@@ -85,7 +92,7 @@ def bench_f(f: Callable, n=10) -> (int, str):
 
 
 def suite(tests: Iterable[Callable], n=10):
-    results = {bench_f(test) for test in tests}
+    results = {bench_f(test, n) for test in tests}
     offset = max([len(test.__name__) for test in tests]) + 5
 
     for bench, f in sorted(results):
@@ -101,7 +108,8 @@ if __name__ == '__main__':
     suite([
         bench_index,
         bench_in,
-        bench_re,
+        bench_extract_state_re,
+        bench_extract_playlist_re,
         bench_in_enum,
         bench_in_cached
     ], n=100)
