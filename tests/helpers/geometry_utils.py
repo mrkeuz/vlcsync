@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from dataclasses import dataclass
-import functools
 import re
 from typing import Optional
 
-from vlcsync.cmd_utils import out
+from tests.cmd_utils import out
 
 
 @dataclass
@@ -24,7 +23,7 @@ class Geom:
         return self.w_h.split("x")[1]
 
 def apply_geom_for(window_title: str, geom: Geom):
-    for wid in out(f"xdotool search --onlyvisible --name 'VLC'").splitlines():
+    for wid in out("xdotool search --onlyvisible --name 'VLC'").splitlines():
         wind_name = out(f"""xdotool getwindowname "{wid}" """)
         if window_title in wind_name:
             out(f"xdotool windowsize {wid} {geom.width} {geom.height}")
@@ -32,20 +31,20 @@ def apply_geom_for(window_title: str, geom: Geom):
 
 
 def rearrange(dev: str):
-    for wid in out(f"xdotool search --onlyvisible --name 'VLC'").splitlines():
+    for wid in out("xdotool search --onlyvisible --name 'VLC'").splitlines():
         wind_name = out(f"""xdotool getwindowname "{wid}" """)
         # geom = out(f"""xdotool getwindowgeometry "{wid}" """)
         # print(f"  wid {wid} - {wind_name} ({geom})")
 
         # Move
-        g = geom_for_window(wind_name, dev)
+        g = _geom_for_window(wind_name, dev)
         if g:
             out(f"xdotool windowsize {wid} {g.width} {g.height}")
             out(f"xdotool windowmove {wid} {g.x} {g.y}")
 
 
 def _geom_for_window(window_name: str, dev="dev") -> Optional[Geom]:
-    for regex, geom in geom_list(dev).items():
+    for regex, geom in _geom_list(dev).items():
         if re.search(regex, window_name):
             return geom
 
