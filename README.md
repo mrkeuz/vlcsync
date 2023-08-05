@@ -81,6 +81,6 @@ Awesome [use-case](./docs/awesome.md) ideas
 
 Any thoughts, ideas and contributions welcome!
 
-Special thanks to **KorDen32** for inspiration! <img src="./docs/F1.svg" alt="F1" width="45"/>
+A special thanks to **KorDen32** for inspiration! <img src="./docs/F1.svg" alt="F1" width="45"/>
 
 Enjoy!
