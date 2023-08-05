@@ -75,7 +75,7 @@ class LocalProcessFinderProvider(IVlcListFinder):
     @functools.lru_cache(maxsize=1024)
     def is_vlc(self, proc: Process):
         with skip_on_error():
-            return proc.name() == 'vlc' or self.vlc_cmdline(proc)
+            return proc.name() is not None and proc.name().lower() == 'vlc' or self.vlc_cmdline(proc)
 
         # noinspection PyUnreachableCode
         return False
@@ -83,7 +83,7 @@ class LocalProcessFinderProvider(IVlcListFinder):
     @staticmethod
     def vlc_cmdline(proc) -> bool:
         for part in proc.cmdline():
-            if 'vlc' in part:
+            if part is not None and 'vlc' in part.lower():
                 return True
         return False
 
