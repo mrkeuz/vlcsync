@@ -61,7 +61,7 @@ Awesome [use-case](./docs/awesome.md) ideas
   Difference between videos can be **up to ~0.5 seconds** in worst case. Especially when playing from network share, 
   due buffering time and network latency.
 
-- Currently, tested only on:
+- Currently, tested on:
   - Linux (Ubuntu 20.04)
   - Windows 7 (32-bit)
   - Windows 10 (64-bit)
