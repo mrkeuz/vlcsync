@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional, List
+from typing import Optional
 
 from loguru import logger
 
@@ -39,8 +39,16 @@ class State:
     play_state: PlayState
     seek: int
     playlist_order_idx: int
-    # Real clock time of video start
-    start_at_abs_time: float = field(repr=False)
+    """
+    vid_start_at - is abs time of video start in given vlc
+    
+    If this time changed it indicates time seek 
+    
+    See for details:
+       - play_in_same_pos()
+       - Vlc.cur_state() 
+    """
+    vid_start_at: float = field(repr=False)
 
     def same(self, other: State):
         return (self.same_play_state(other) and
@@ -60,14 +68,14 @@ class State:
 
     def play_in_same_pos(self: State, other: State):
         """ Check time_diff only when play """
-        desync_secs = abs(self.start_at_abs_time - other.start_at_abs_time)
+        desync_secs = abs(self.vid_start_at - other.vid_start_at)
 
         if 2 < desync_secs < MAX_DESYNC_SECONDS:
             logger.debug(f"Asynchronous anomaly between probes: {desync_secs} secs")
 
         return (
                 self.play_state == other.play_state == PlayState.PLAYING and
-                # self.start_at and other.start_at and
+                self.vid_start_at and other.vid_start_at and
                 desync_secs < MAX_DESYNC_SECONDS
         )
 
