@@ -51,7 +51,7 @@ def main(rc_host_list: Set[VlcId], no_local_discover, volume_sync):
         try:
             with Syncer(app_config) as s:
                 while True:
-                    s.do_sync()
+                    s.do_check_synchronized()
                     time.sleep(0.05)
         except KeyboardInterrupt:
             sys.exit(0)
