@@ -50,14 +50,14 @@ class Syncer:
         self.env = VlcProcs(vlc_finders)
 
     def __enter__(self):
-        self.do_sync()
+        self.do_check_synchronized()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
-    def do_sync(self):
-        self.log_with_debounce("Sync...")
+    def do_check_synchronized(self):
+        self.log_with_debounce("do_check_synchronized()...")
         try:
             if self.app_config.volume_sync:
                 self.sync_volume()
