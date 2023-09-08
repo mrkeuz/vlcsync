@@ -1,7 +1,7 @@
 VLC Sync
 ========
 
-Utility for synchronize multiple instances of VLC. Supports seek, play and pause. 
+Utility for synchronize multiple instances of VLC. Supports seek, play and pause/stop, playlist and volume sync. 
   
 
 #### Motivation
@@ -42,6 +42,10 @@ $ vlcsync --rc-host 192.168.1.100:12345 --rc-host 192.168.1.50:54321
 
 # For disable local discovery (only remote instances)
 $ vlcsync --no-local-discovery --rc-host 192.168.1.100:12345
+
+# Started from version 0.3.0 (playlists sync)
+# Support volume sync for exotic cases
+$ vlcsync --volume-sync
 
 # For help and see all options
 $ vlcsync --help
