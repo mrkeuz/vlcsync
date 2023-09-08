@@ -78,7 +78,7 @@ Awesome [use-case](./docs/awesome.md) ideas
 - [Syncplay](https://github.com/Syncplay/syncplay) - very promised, but little [complicated](https://github.com/Syncplay/syncplay/discussions/463) for sync different videos
 - [bino](https://bino3d.org/) - working, very strange controls, file dialog not working and only fullscreen
 - [gridplayer](https://github.com/vzhd1701/gridplayer) - low fps by some reason
-- [mpv](https://github.com/mpv-player/mpv) - with [mixing multiple videos](https://superuser.com/a/1325668/1272472) in one window. Unfortunally does not support multiple screens
+- [mpv](https://github.com/mpv-player/mpv) - with [mixing multiple videos](https://superuser.com/a/1325668/1272472) in one window. Unfortunately does not support multiple screens
 - [AVPlayer](http://www.awesomevideoplayer.com/) - only Win, macOS, up to 4 videos in free version
 
 ## Contributing
