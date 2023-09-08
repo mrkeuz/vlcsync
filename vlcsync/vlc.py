@@ -31,7 +31,7 @@ class Vlc:
         status = self.vlc_conn.cmd("status")
         return self._extract_state(status)
 
-    def get_time(self) -> int | None:
+    def get_seek(self) -> int | None:
         seek = self.vlc_conn.cmd("get_time")
         if seek != '':
             return int(seek)
@@ -67,12 +67,13 @@ class Vlc:
         self.vlc_conn.cmd("play")
 
     def cur_state(self) -> State:
-        get_time = self.get_time()
+        cur_seek = self.get_seek()
 
         return State(self.play_state(),
-                     get_time,
+                     cur_seek,
                      self.playlist().active_order_index(),
-                     time.time() - (get_time or 0)
+                     # Abs time of video start
+                     time.time() - (cur_seek or 0)
                      )
 
     def is_state_change(self) -> (bool, State):
@@ -218,7 +219,7 @@ class VlcProcs:
         logger.debug(f"Detect change to {state} from {source.vlc_id}")
         logger.debug(f" old --> {source.prev_state} ")
         logger.debug(f" new --> {state} ")
-        logger.debug(f" Time diff abs(old - new) {abs(state.start_at_abs_time - source.prev_state.start_at_abs_time)}")
+        logger.debug(f" Time diff abs(old - new) {abs(source.prev_state.vid_start_at - state.vid_start_at)}")
         logger.debug("<" * 60)
         logger.debug("")
         print(">>> Sync players...")
