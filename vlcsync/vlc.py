@@ -46,7 +46,7 @@ class Vlc:
     def volume(self) -> Optional[int]:
         vol = self.vlc_conn.cmd("volume")
         if vol.strip() != '':
-            return int(vol)
+            return int(float(vol.replace(",",'.')))
         else:
             return None
 
