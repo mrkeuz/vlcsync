@@ -51,14 +51,10 @@ class State:
     vid_start_at: float = field(repr=False)
 
     def same(self, other: State):
-        return (self.same_play_state(other) and
-                self.same_playlist_item(other) and
-                (
-                        self.play_in_same_pos(other) or
-                        self.pause_is_same_pos(other) or
-                        self.both_stopped(other)
-                )
-                )
+        playlist_same = self.same_playlist_item(other)
+        full_same = (self.same_play_state(other) and playlist_same and (
+                    self.play_in_same_pos(other) or self.pause_is_same_pos(other) or self.both_stopped(other)))
+        return full_same, playlist_same
 
     def same_play_state(self, other: State):
         return self.play_state == other.play_state

@@ -12,7 +12,7 @@ from vlcsync.vlc_finder import print_exc
 from vlcsync.vlc_state import VlcId
 
 # Also ref in project.toml
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 
 @click.command

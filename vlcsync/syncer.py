@@ -3,11 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 import sys
 import time
-from typing import Set
+from typing import Set, List
 
 from loguru import logger
 
-from vlcsync.vlc import VLC_IFACE_IP, VlcProcs
+from vlcsync.vlc import VLC_IFACE_IP, VlcProcs, Vlc
 from vlcsync.vlc_finder import LocalProcessFinderProvider, ExtraHostFinder
 from vlcsync.vlc_socket import VlcConnectionError
 
@@ -69,11 +69,24 @@ class Syncer:
 
     def sync_playstate(self):
         for vlc_id, vlc in self.env.all_vlc.items():
-            is_changed, state = vlc.is_state_change()
+            is_changed, state, playlist_changed = vlc.is_state_change()
 
             if is_changed:
+                # Workaround Save volumes.
+                # When playlist items changed ALSO happen volumes sync by some reason. But SHOULD NOT!
+                volumes: List[tuple[Vlc, int]] = []
+                if not self.app_config.volume_sync and playlist_changed:
+                    volumes = [(vlc1, vlc1.volume()) for _, vlc1 in self.env.all_vlc.items()]
+                #
+
                 print(f"\nVlc state change detected from ({vlc_id})")
                 self.env.sync_all(state, vlc)
+
+                # Restore volumes if needed
+                if volumes:
+                    for vlc_next, volume in volumes:
+                        vlc_next.set_volume(volume)
+
                 break
 
     def sync_volume(self):

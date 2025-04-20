@@ -79,10 +79,10 @@ class Vlc:
     def is_state_change(self) -> (bool, State):
         cur_state: State = self.cur_state()
         prev_state: State = self.prev_state
-        is_change = not cur_state.same(prev_state)
+        full_same, playlist_same = cur_state.same(prev_state)
 
         # Return cur_state for reduce further socket communications
-        return is_change, cur_state
+        return not full_same, cur_state, not playlist_same
 
     def sync_to(self, new_state: State, source: Vlc):
 
@@ -214,12 +214,12 @@ class VlcProcs:
     def all_vlc(self) -> dict[VlcId, Vlc]:
         return self._vlc_instances.copy()  # copy: for thread safe
 
-    def sync_all(self, state: State, source: Vlc):
+    def sync_all(self, state: State, source_vlc: Vlc):
         logger.debug(">" * 60)
-        logger.debug(f"Detect change to {state} from {source.vlc_id}")
-        logger.debug(f" old --> {source.prev_state} ")
+        logger.debug(f"Detect change to {state} from {source_vlc.vlc_id}")
+        logger.debug(f" old --> {source_vlc.prev_state} ")
         logger.debug(f" new --> {state} ")
-        logger.debug(f" Time diff abs(old - new) {abs(source.prev_state.vid_start_at - state.vid_start_at)}")
+        logger.debug(f" Time diff abs(old - new) {abs(source_vlc.prev_state.vid_start_at - state.vid_start_at)}")
         logger.debug("<" * 60)
         logger.debug("")
         print(">>> Sync players...")
@@ -227,7 +227,7 @@ class VlcProcs:
         for next_pid, next_vlc in self.all_vlc.items():
             next_vlc: Vlc
             print(f"    Sync {next_pid} to {state}")
-            next_vlc.sync_to(state, source)
+            next_vlc.sync_to(state, source_vlc)
         print()
 
     def dereg(self, vlc_id: VlcId):
