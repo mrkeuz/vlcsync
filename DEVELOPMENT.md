@@ -5,6 +5,11 @@
   pip3 install -U .
   ```
 
+### Build on windows 
+  ```
+  ./build_win.sh
+  ```
+
 ### Publish
   - Prepare  
      ```shell
