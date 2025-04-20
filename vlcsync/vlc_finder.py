@@ -65,7 +65,7 @@ class LocalProcessFinderProvider(IVlcListFinder):
     @functools.lru_cache(maxsize=1024)
     def _has_listen_port(proc: Process, iface_ip) -> int | None:
         with skip_on_error():
-            for p_conn in proc.connections("tcp4"):
+            for p_conn in proc.net_connections("tcp4"):
                 if p_conn.status == 'LISTEN' and p_conn.laddr.ip == iface_ip:
                     return p_conn.laddr.port
 
