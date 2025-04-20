@@ -195,7 +195,7 @@ class VlcProcs:
             for vlc_id in vlc_candidates:
                 if vlc_id not in self._vlc_instances.keys():
                     if vlc := self.try_connect(vlc_id):
-                        print(f"Found active instance {vlc_id}, with state {vlc.cur_state()}")
+                        print(f"Found active instance {vlc_id}, with state {vlc.cur_state()}", flush=True)
                         self._vlc_instances[vlc_id] = vlc
 
             logger.debug(f"Compute all_vlc (took {time.time() - start:.3f})...")
@@ -207,7 +207,7 @@ class VlcProcs:
             return Vlc(vlc_id)
         except Exception as e:
             logger.opt(exception=True).debug("Cannot connect to {0}, cause: {1}", vlc_id, e)
-            print(f"Cannot connect to {vlc_id} socket, cause: {e}. Skipping. Enable debug for more info. See --help. ")
+            print(f"Cannot connect to {vlc_id} socket, cause: {e}. Skipping. Enable debug for more info. See --help. ", flush=True)
             return None
 
     @property
@@ -222,16 +222,16 @@ class VlcProcs:
         logger.debug(f" Time diff abs(old - new) {abs(source_vlc.prev_state.vid_start_at - state.vid_start_at)}")
         logger.debug("<" * 60)
         logger.debug("")
-        print(">>> Sync players...")
+        print(">>> Sync players...", flush=True)
 
         for next_pid, next_vlc in self.all_vlc.items():
             next_vlc: Vlc
-            print(f"    Sync {next_pid} to {state}")
+            print(f"    Sync {next_pid} to {state}", flush=True)
             next_vlc.sync_to(state, source_vlc)
         print()
 
     def dereg(self, vlc_id: VlcId):
-        print(f"Detect vlc instance closed {vlc_id}")
+        print(f"Detect vlc instance closed {vlc_id}", flush=True)
         if vlc_to_close := self._vlc_instances.pop(vlc_id, None):
             vlc_to_close.close()
 

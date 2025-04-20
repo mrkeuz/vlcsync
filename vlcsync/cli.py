@@ -43,7 +43,7 @@ __version__ = "0.3.1"
               """)
 def main(rc_host_list: Set[VlcId], no_local_discover, volume_sync):
     """Utility for synchronize multiple instances of VLC. Supports seek, play and pause."""
-    print("Vlcsync started...")
+    print("Vlcsync started...", flush=True)
 
     app_config = AppConfig(rc_host_list, no_local_discover, volume_sync)
     time.sleep(2)  # Wait instances
@@ -57,4 +57,4 @@ def main(rc_host_list: Set[VlcId], no_local_discover, volume_sync):
             sys.exit(0)
         except Exception:
             print_exc()
-            print("Exception detected. Restart sync...")
+            print("Exception detected. Restart sync...", flush=True)

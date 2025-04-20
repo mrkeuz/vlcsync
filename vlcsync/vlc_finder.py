@@ -90,11 +90,12 @@ class LocalProcessFinderProvider(IVlcListFinder):
 
 def print_exc():
     print("-" * 60)
-    print("Exception in user code: ")
+    print("Exception in user code: ", flush=True)
     print("-" * 60)
     traceback.print_exc(file=sys.stdout)
     print("-" * 60)
     print()
+    sys.stdout.flush()
 
 
 class ExtraHostFinder(IVlcListFinder):

@@ -30,21 +30,21 @@ class Syncer:
         vlc_finders = set()
         if not self.app_config.no_local_discovery:
             vlc_finders.add(LocalProcessFinderProvider(VLC_IFACE_IP))
-            print(f"  Discover instances on {VLC_IFACE_IP} iface...")
+            print(f"  Discover instances on {VLC_IFACE_IP} iface...", flush=True)
         else:
-            print("  Local discovery vlc instances DISABLED...")
+            print("  Local discovery vlc instances DISABLED...", flush=True)
 
         if app_config.extra_rc_hosts:
             vlc_finders.add(ExtraHostFinder(app_config.extra_rc_hosts))
             for rc_host in app_config.extra_rc_hosts:
                 rc_host: VlcId
-                print(f"  Manual host defined {rc_host.addr}:{rc_host.port}")
+                print(f"  Manual host defined {rc_host.addr}:{rc_host.port}", flush=True)
         else:
-            print("""  Manual vlc addresses ("--rc-host" args) NOT provided...""")
+            print("""  Manual vlc addresses ("--rc-host" args) NOT provided...""", flush=True)
 
         if not vlc_finders:
             print("\nTarget vlc instances not selected (nor autodiscover, nor manually). \n"
-                  """See: "vlcsync --help" for more info""")
+                  """See: "vlcsync --help" for more info""", flush=True)
             sys.exit(1)
 
         self.env = VlcProcs(vlc_finders)
@@ -79,7 +79,7 @@ class Syncer:
                     volumes = [(vlc1, vlc1.volume()) for _, vlc1 in self.env.all_vlc.items()]
                 #
 
-                print(f"\nVlc state change detected from ({vlc_id})")
+                print(f"\nVlc state change detected from ({vlc_id})", flush=True)
                 self.env.sync_all(state, vlc)
 
                 # Restore volumes if needed
