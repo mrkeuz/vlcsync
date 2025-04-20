@@ -86,7 +86,9 @@ class Syncer:
                 if volumes:
                     for vlc_next, volume in volumes:
                         vlc_next.set_volume(volume)
-
+                # Trying to fix endless resyncing hang
+                # Cannot find reproduce steps for that
+                time.sleep(0.5)
                 break
 
     def sync_volume(self):
