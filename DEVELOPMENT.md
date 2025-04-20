@@ -5,14 +5,6 @@
   pip3 install -U .
   ```
 
-### Build on windows 
-  
-  Note `pip3 install -U .` needed for update libs
-  ```
-  pip3 install -U .
-  python py2exe.py
-  ```
-  
 ### Publish
   - Prepare  
      ```shell
