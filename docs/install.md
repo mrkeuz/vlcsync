@@ -2,7 +2,7 @@
 
 ### Windows detailed instructions
 
-- Install [python 3.8 or newer](https://www.python.org/downloads/windows/) (required [Add Python to PATH](https://datatofish.com/add-python-to-windows-path/) checkbox)
+- Install [python 3.8 or newer](https://www.python.org/downloads/windows/) (required "Add Python to PATH" checkbox during install or add python to PATH manually)
 - Restart system
 - Start `cmd.exe` (Press `Super` → type `cmd` → press `Enter`)
 - Run in console: `pip3 install vlcsync`
