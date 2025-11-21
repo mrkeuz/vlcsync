@@ -84,11 +84,12 @@ class Vlc:
         # Return cur_state for reduce further socket communications
         return not full_same, cur_state, not playlist_same
 
-    def sync_to(self, new_state: State, source: Vlc):
+    def sync_to(self, new_state: State, source: Vlc, app_config: AppConfig):
 
         self._sync_playlist(new_state)
         self._sync_playstate(new_state)
-        self._sync_timeline(new_state, source)
+        if not app_config.no_timestamp_sync:
+            self._sync_timeline(new_state, source)
 
         self.prev_state = self.cur_state()
 
@@ -214,7 +215,7 @@ class VlcProcs:
     def all_vlc(self) -> dict[VlcId, Vlc]:
         return self._vlc_instances.copy()  # copy: for thread safe
 
-    def sync_all(self, state: State, source_vlc: Vlc):
+    def sync_all(self, state: State, source_vlc: Vlc, app_config: AppConfig):
         logger.debug(">" * 60)
         logger.debug(f"Detect change to {state} from {source_vlc.vlc_id}")
         logger.debug(f" old --> {source_vlc.prev_state} ")
@@ -227,7 +228,7 @@ class VlcProcs:
         for next_pid, next_vlc in self.all_vlc.items():
             next_vlc: Vlc
             print(f"    Sync {next_pid} to {state}", flush=True)
-            next_vlc.sync_to(state, source_vlc)
+            next_vlc.sync_to(state, source_vlc, app_config)
         print()
 
     def dereg(self, vlc_id: VlcId):

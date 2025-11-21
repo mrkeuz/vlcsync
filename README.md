@@ -47,6 +47,10 @@ $ vlcsync --no-local-discovery --rc-host 192.168.1.100:12345
 # Support volume sync for exotic cases
 $ vlcsync --volume-sync
 
+# Started from version 0.3.2 (disable timestamp sync)
+# Support disable timestamp sync to enable playing media with different start times
+$ vlcsync --no-timestamp-sync
+
 # For help and see all options
 $ vlcsync --help
 ```

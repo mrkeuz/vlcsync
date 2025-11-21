@@ -18,6 +18,7 @@ from vlcsync.vlc_state import VlcId
 class AppConfig:
     extra_rc_hosts: Set[VlcId]
     no_local_discovery: bool
+    no_timestamp_sync: bool
     volume_sync: bool
 
 
@@ -80,7 +81,7 @@ class Syncer:
                 #
 
                 print(f"\nVlc state change detected from ({vlc_id})", flush=True)
-                self.env.sync_all(state, vlc)
+                self.env.sync_all(state, vlc, self.app_config)
 
                 # Restore volumes if needed
                 if volumes:
