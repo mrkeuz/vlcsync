@@ -1,26 +1,17 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import sys
 import time
-from typing import Set, List
+from typing import List
 
 from loguru import logger
 
+from vlcsync.app_config import AppConfig
 from vlcsync.vlc import VLC_IFACE_IP, VlcProcs, Vlc
 from vlcsync.vlc_finder import LocalProcessFinderProvider, ExtraHostFinder
 from vlcsync.vlc_socket import VlcConnectionError
 
 from vlcsync.vlc_state import VlcId
-
-
-@dataclass
-class AppConfig:
-    extra_rc_hosts: Set[VlcId]
-    no_local_discovery: bool
-    no_timestamp_sync: bool
-    volume_sync: bool
-
 
 class Syncer:
     def __init__(self, app_config: AppConfig):

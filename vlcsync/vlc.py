@@ -9,6 +9,7 @@ from typing import Set, List, Optional
 
 from loguru import logger
 
+from vlcsync.app_config import AppConfig
 from vlcsync.vlc_finder import IVlcListFinder
 from vlcsync.vlc_socket import VlcSocket
 from vlcsync.vlc_state import PlayState, State, VlcId, PlayList, PlayListItem
@@ -35,6 +36,7 @@ class Vlc:
         seek = self.vlc_conn.cmd("get_time")
         if seek != '':
             return int(seek)
+        return None
 
     def playlist_goto(self, vlc_internal_index: int):
         self.vlc_conn.cmd(f"goto {vlc_internal_index}")
@@ -76,7 +78,7 @@ class Vlc:
                      time.time() - (cur_seek or 0)
                      )
 
-    def is_state_change(self) -> (bool, State):
+    def is_state_change(self) -> (bool, State, bool):
         cur_state: State = self.cur_state()
         prev_state: State = self.prev_state
         full_same, playlist_same = cur_state.same(prev_state)
@@ -84,14 +86,17 @@ class Vlc:
         # Return cur_state for reduce further socket communications
         return not full_same, cur_state, not playlist_same
 
-    def sync_to(self, new_state: State, source: Vlc, app_config: AppConfig):
+    def sync_to(self, new_state: State, source: Vlc, app_config: AppConfig) -> State:
 
         self._sync_playlist(new_state)
         self._sync_playstate(new_state)
         if not app_config.no_timestamp_sync:
             self._sync_timeline(new_state, source)
 
-        self.prev_state = self.cur_state()
+        cur_state = self.cur_state()
+        self.prev_state = cur_state
+
+        return cur_state
 
     def _sync_timeline(self, new_state: State, source: Vlc):
         cur_play_state = self.play_state()
@@ -227,8 +232,8 @@ class VlcProcs:
 
         for next_pid, next_vlc in self.all_vlc.items():
             next_vlc: Vlc
-            print(f"    Sync {next_pid} to {state}", flush=True)
-            next_vlc.sync_to(state, source_vlc, app_config)
+            new_state = next_vlc.sync_to(state, source_vlc, app_config)
+            print(f"    Synced {next_pid} to {new_state}", flush=True)
         print()
 
     def dereg(self, vlc_id: VlcId):

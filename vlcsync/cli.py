@@ -7,7 +7,8 @@ from typing import Set
 import click
 
 from vlcsync.cli_utils import parse_url
-from vlcsync.syncer import AppConfig, Syncer
+from vlcsync.syncer import Syncer
+from vlcsync.app_config import AppConfig
 from vlcsync.vlc_finder import print_exc
 from vlcsync.vlc_state import VlcId
 
