@@ -78,7 +78,6 @@ class Syncer:
                 volumes: List[tuple[Vlc, int]] = []
                 if not self.app_config.volume_sync and playlist_changed:
                     volumes = [(vlc1, vlc1.volume()) for _, vlc1 in self.env.all_vlc.items()]
-                #
 
                 print(f"\nVlc state change detected from ({vlc_id})", flush=True)
                 self.env.sync_all(state, vlc, self.app_config)
