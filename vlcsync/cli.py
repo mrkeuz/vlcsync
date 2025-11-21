@@ -12,7 +12,7 @@ from vlcsync.vlc_finder import print_exc
 from vlcsync.vlc_state import VlcId
 
 # Also ref in project.toml
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 
 @click.command
@@ -29,6 +29,11 @@ __version__ = "0.3.1"
               required=False,
               is_flag=True,
               help="Disable discovery local vlc instances.")
+@click.option("--no-timestamp-sync",
+              "no_timestamp_sync",
+              required=False,
+              is_flag=True,
+              help="Disable timestamp sync between players.")
 @click.option("--volume-sync",
               "volume_sync",
               default=False,
@@ -41,11 +46,11 @@ __version__ = "0.3.1"
               \n  
               And you can control volume from main video player.
               """)
-def main(rc_host_list: Set[VlcId], no_local_discover, volume_sync):
+def main(rc_host_list: Set[VlcId], no_local_discover, no_timestamp_sync, volume_sync):
     """Utility for synchronize multiple instances of VLC. Supports seek, play and pause."""
     print("Vlcsync started...", flush=True)
 
-    app_config = AppConfig(rc_host_list, no_local_discover, volume_sync)
+    app_config = AppConfig(rc_host_list, no_local_discover, no_timestamp_sync, volume_sync)
     time.sleep(2)  # Wait instances
     while True:
         try:

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vlcsync"
-version = "0.3.1"
+version = "0.3.2"
 description = "Utility for synchronize multiple instances of VLC. Supports seek, play and pause. "
 authors = ["mrkeuz <mrkeuz@users.noreply.github.com>"]
 license = "MIT"
